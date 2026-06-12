@@ -1,512 +1,586 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="dark" lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#090c0d">
+<meta name="theme-color" content="#0c160e">
 <title>PikBeBoi 🏓</title>
+
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+
+<script id="tailwind-config">
+tailwind.config = {
+  darkMode:"class",
+  theme:{extend:{
+    colors:{
+      "primary-fixed":"#60ff99","primary-fixed-dim":"#00e479","primary-container":"#00ff88",
+      "on-primary":"#003919","on-primary-container":"#007139",
+      "secondary-container":"#fecb00","on-secondary-container":"#6e5700",
+      "secondary-fixed":"#ffe08b","secondary-fixed-dim":"#f1c100",
+      "tertiary-fixed-dim":"#93ccff",
+      "surface":"#0c160e","surface-dim":"#0c160e","background":"#0c160e",
+      "surface-container-lowest":"#071009","surface-container-low":"#141e16",
+      "surface-container":"#18221a","surface-container-high":"#222c24",
+      "surface-container-highest":"#2d372e","surface-variant":"#2d372e",
+      "on-surface":"#dae6d8","on-surface-variant":"#b9cbb9",
+      "outline":"#849585","outline-variant":"#3b4b3d",
+      "error":"#ffb4ab","error-container":"#93000a","on-error":"#690005",
+      "inverse-surface":"#dae6d8","inverse-on-surface":"#29332a","inverse-primary":"#006d37",
+      "primary":"#f1ffef","secondary":"#ffecc0","tertiary":"#fafbff",
+    },
+    fontFamily:{ sans:["Geist","system-ui","-apple-system","sans-serif"] },
+  }}
+}
+</script>
+
 <style>
-:root{
-  --bg:#090c0d;--surf:#111618;--surf2:#192020;--bdr:#233030;
-  --grn:#00ff88;--ylw:#ffcc00;--red:#ff4455;--blu:#00aaff;
-  --txt:#ddeee8;--mut:#506860;--r:12px;--rs:8px;
-  --st:env(safe-area-inset-top,0px);
-  --sb:env(safe-area-inset-bottom,0px);
-}
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;height:100dvh}
-body{background:var(--bg);color:var(--txt);
-  font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
-  height:100%;height:100dvh;overflow:hidden;
-  display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
+  /* ── Material Symbols ── */
+  .material-symbols-outlined {
+    font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;
+    font-family:'Material Symbols Outlined';font-size:24px;
+    line-height:1;letter-spacing:normal;text-transform:none;
+    display:inline-block;white-space:nowrap;direction:ltr;
+    user-select:none;
+  }
+  .icon-fill { font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24 }
 
-/* HEADER */
-#hdr{display:flex;align-items:center;justify-content:space-between;
-  padding:0 14px;padding-top:var(--st);
-  height:calc(52px + var(--st));
-  background:var(--surf);border-bottom:1px solid var(--bdr);
-  flex-shrink:0;gap:8px;z-index:100;position:relative}
-.logo{font-size:1.2rem;font-weight:800;color:var(--grn);white-space:nowrap;letter-spacing:-.5px}
-.logo span{color:var(--txt);font-weight:400}
-.hrow{display:flex;align-items:center;gap:6px}
-.pill{background:var(--surf2);color:var(--txt);border:1px solid var(--bdr);
-  border-radius:999px;padding:5px 10px;font-size:.76rem;cursor:pointer;outline:none;-webkit-appearance:none}
-.pill:focus{border-color:var(--grn)}
-.ibtn{width:38px;height:38px;border-radius:999px;border:1px solid var(--bdr);
-  background:var(--surf2);color:var(--txt);display:flex;align-items:center;
-  justify-content:center;font-size:1rem;cursor:pointer;flex-shrink:0}
-.ibtn:active{background:var(--bdr)}
-.btn{padding:6px 12px;border-radius:var(--rs);border:none;cursor:pointer;
-  font-size:.78rem;font-weight:600;white-space:nowrap}
-.bg{background:var(--grn);color:#000}
-.bs{background:var(--surf2);color:var(--txt);border:1px solid var(--bdr)}
-.br{background:var(--red);color:#fff}
-.bb{background:var(--blu);color:#fff}
-.by{background:var(--ylw);color:#000}
+  /* ── Glow helpers ── */
+  .glow-green { box-shadow:0 0 12px rgba(96,255,153,.35) }
+  .glow-green-sm { box-shadow:0 0 7px rgba(96,255,153,.3) }
+  .glow-yellow-sm { box-shadow:0 0 7px rgba(254,203,0,.35) }
+  .glow-red-sm { box-shadow:0 0 7px rgba(255,180,171,.35) }
+  .text-glow { text-shadow:0 0 10px rgba(96,255,153,.45) }
+  .skeleton-line { filter:drop-shadow(0 0 2px rgba(96,255,153,.8)) }
 
-/* MAIN */
-#main{flex:1;display:flex;overflow:hidden;min-height:0}
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar { width:4px }
+  ::-webkit-scrollbar-track { background:#071009 }
+  ::-webkit-scrollbar-thumb { background:#3b4b3d; border-radius:10px }
 
-/* VIDEO SECTION
-   Video element is VISIBLE (object-fit:contain).
-   Canvas is a TRANSPARENT overlay (pointer-events:none) — skeleton only.
-   Tap overlay (tapDiv) receives person-selection clicks. */
-#vs{position:relative;background:#000;
-  display:flex;align-items:center;justify-content:center;
-  overflow:hidden;flex-shrink:0}
-#videoEl{width:100%;height:100%;object-fit:contain;display:none;background:#000}
-/* canvas: transparent overlay, NO pointer events */
-#oc{position:absolute;inset:0;width:100%;height:100%;
-  display:none;pointer-events:none}
-/* tap overlay: transparent, receives taps for person selection */
-#tapDiv{position:absolute;inset:0;z-index:5;display:none;cursor:crosshair}
+  /* ── Shot card active pulse ── */
+  .sc-active {
+    border-color:rgba(96,255,153,.45) !important;
+    background-color:rgba(0,255,136,.06) !important;
+  }
 
-/* Start prompt */
-#sp{position:absolute;inset:0;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;text-align:center;
-  color:var(--mut);padding:20px;pointer-events:none;z-index:3}
-#sp .e{font-size:2.6rem;margin-bottom:10px}
-#sp p{font-size:.88rem;line-height:1.6}
-#sp.tappable{pointer-events:auto;cursor:pointer}
+  /* ── Tab active ── */
+  .tab-on { color:#60ff99 }
+  .tab-on .material-symbols-outlined { font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24 }
+  .tab-off { color:#b9cbb9 }
 
-/* Video overlays — all pointer-events:none */
-#shotBadge{position:absolute;top:12px;left:50%;transform:translateX(-50%);
-  background:rgba(0,0,0,.8);border:2px solid var(--grn);border-radius:999px;
-  padding:5px 18px;font-size:.88rem;font-weight:800;color:var(--grn);
-  letter-spacing:2px;text-transform:uppercase;display:none;z-index:10;
-  backdrop-filter:blur(6px);white-space:nowrap;pointer-events:none}
-#ratingPop{position:absolute;bottom:64px;left:50%;transform:translateX(-50%);
-  background:rgba(0,0,0,.8);border-radius:999px;padding:4px 14px;
-  font-size:1rem;letter-spacing:2px;color:var(--ylw);display:none;z-index:10;
-  backdrop-filter:blur(6px);pointer-events:none}
-#selHint{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  background:rgba(0,0,0,.78);color:#fff;border-radius:var(--rs);
-  padding:8px 16px;font-size:.82rem;z-index:11;
-  backdrop-filter:blur(6px);display:none;text-align:center;
-  white-space:nowrap;pointer-events:none}
-#pcBadge{position:absolute;top:12px;right:52px;background:rgba(0,0,0,.72);
-  border-radius:999px;padding:3px 10px;font-size:.72rem;color:var(--txt);
-  z-index:11;display:none;pointer-events:none}
-#flipBtn{position:absolute;top:10px;right:10px;z-index:15;width:36px;height:36px;
-  border-radius:50%;background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.2);
-  color:#fff;display:none;align-items:center;justify-content:center;font-size:1rem;cursor:pointer}
+  /* ── Feedback dot colors ── */
+  .dot-good { background:#60ff99; box-shadow:0 0 7px rgba(96,255,153,.4) }
+  .dot-warn { background:#fecb00; box-shadow:0 0 7px rgba(254,203,0,.4) }
+  .dot-bad  { background:#ffb4ab; box-shadow:0 0 7px rgba(255,180,171,.4) }
 
-/* Loading overlay */
-#loadOverlay{position:absolute;inset:0;background:rgba(0,0,0,.86);
-  display:none;flex-direction:column;align-items:center;justify-content:center;z-index:20}
-.spinner{width:38px;height:38px;border:3px solid var(--bdr);border-top-color:var(--grn);
-  border-radius:50%;animation:spin .8s linear infinite;margin-bottom:12px}
-@keyframes spin{to{transform:rotate(360deg)}}
-#loadTxt{font-size:.84rem;color:var(--mut);text-align:center;padding:0 20px}
+  /* ── Bottom sheet ── */
+  .sheet-bg { background:linear-gradient(180deg,rgba(24,34,26,.97) 0%,rgba(12,22,14,1) 100%) }
 
-/* REWATCH BAR */
-#rwBar{position:absolute;bottom:0;left:0;right:0;z-index:16;
-  background:rgba(9,12,13,.92);backdrop-filter:blur(10px);
-  padding:8px 14px;padding-bottom:calc(8px + var(--sb));
-  display:none;flex-direction:column;gap:6px}
-#scrubWrap{position:relative;height:24px;cursor:pointer}
-#scrubTrack{position:absolute;top:50%;left:0;right:0;height:4px;
-  margin-top:-2px;background:rgba(255,255,255,.15);border-radius:2px}
-#scrubFill{height:100%;background:var(--grn);border-radius:2px;width:0%}
-#scrubMarks{position:absolute;inset:0;pointer-events:none}
-.smark{position:absolute;top:50%;transform:translate(-50%,-50%);
-  width:10px;height:10px;border-radius:50%;border:2px solid rgba(0,0,0,.6)}
-#scrubThumb{position:absolute;top:50%;transform:translate(-50%,-50%);
-  width:14px;height:14px;background:#fff;border-radius:50%;left:0%}
-#rwRow{display:flex;align-items:center;justify-content:space-between;gap:8px}
-#rwTime{font-size:.72rem;color:var(--mut);font-variant-numeric:tabular-nums;white-space:nowrap}
-.rwb{background:none;border:none;color:var(--txt);font-size:1rem;cursor:pointer;padding:2px 8px}
-.rwb:active{color:var(--grn)}
+  /* ── Safe area helpers ── */
+  .safe-top    { padding-top:env(safe-area-inset-top,0px) }
+  .h-safe-top  { height:calc(52px + env(safe-area-inset-top,0px)) }
+  .pb-safe-bot { padding-bottom:env(safe-area-inset-bottom,0px) }
 
-/* DESKTOP SIDEBAR */
-#dskBar{width:292px;background:var(--surf);border-left:1px solid var(--bdr);
-  display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
-.dss{padding:12px 14px;border-bottom:1px solid var(--bdr);flex-shrink:0}
-.dscroll{flex:1;overflow-y:auto;padding:10px 12px}
-.dscroll::-webkit-scrollbar{width:3px}
-.dscroll::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:2px}
-
-/* STATS BAR (desktop) */
-#stBar{background:var(--surf);border-top:1px solid var(--bdr);
-  padding:7px 18px;padding-bottom:calc(7px + var(--sb));
-  display:flex;align-items:center;gap:16px;flex-shrink:0}
-.sv{font-size:.95rem;font-weight:700;font-variant-numeric:tabular-nums}
-.sl{font-size:.57rem;color:var(--mut);text-transform:uppercase;letter-spacing:.4px;margin-top:1px}
-.sdv{width:1px;height:22px;background:var(--bdr)}
-.recdot{width:8px;height:8px;background:var(--red);border-radius:50%;
-  animation:blink 1.4s infinite;display:none}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
-
-/* SHARED COMPONENTS */
-.lbl{font-size:.61rem;font-weight:700;text-transform:uppercase;
-  letter-spacing:1.2px;color:var(--mut);margin-bottom:8px}
-.sgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
-.sc{background:var(--surf2);border:1px solid var(--bdr);border-radius:var(--rs);
-  padding:7px 5px;text-align:center;transition:border-color .2s,background .2s}
-.sc.active{border-color:var(--grn);background:rgba(0,255,136,.07)}
-.scn{font-size:1.1rem;font-weight:700;font-variant-numeric:tabular-nums}
-.scl{font-size:.58rem;color:var(--mut);margin-top:1px}
-.fbi{display:flex;gap:7px;align-items:flex-start;margin-bottom:6px;
-  font-size:.78rem;line-height:1.4}
-.fbd{width:6px;height:6px;border-radius:50%;margin-top:4px;flex-shrink:0}
-.fbd.good{background:var(--grn)}.fbd.warn{background:var(--ylw)}
-.exbox{display:flex;gap:8px;align-items:flex-start;padding:8px;
-  background:rgba(0,255,136,.05);border:1px solid rgba(0,255,136,.14);
-  border-radius:var(--rs);font-size:.76rem;line-height:1.4}
-.exbox span{font-size:.88rem;flex-shrink:0;margin-top:1px}
-.she{display:flex;justify-content:space-between;align-items:center;gap:7px;
-  padding:7px 9px;background:var(--surf2);border-radius:var(--rs);
-  margin-bottom:4px;font-size:.8rem;animation:sli .2s ease}
-@keyframes sli{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:translateX(0)}}
-.she-n{font-weight:600;flex:1}
-.she-s{color:var(--ylw);font-size:.68rem;letter-spacing:1px}
-.she-d{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.tmut{color:var(--mut);font-size:.78rem}
-
-/* MOBILE PANEL */
-#mobPanel{display:none;flex-direction:column;background:var(--surf);
-  flex:1;overflow:hidden;border-top:1px solid var(--bdr)}
-#tabBar{display:flex;border-bottom:1px solid var(--bdr);flex-shrink:0}
-.tb{flex:1;padding:9px 4px;font-size:.68rem;font-weight:600;color:var(--mut);
-  background:none;border:none;cursor:pointer;display:flex;flex-direction:column;
-  align-items:center;gap:2px;position:relative}
-.tb .ti{font-size:1.05rem}
-.tb.on{color:var(--grn)}
-.tb.on::after{content:'';position:absolute;bottom:0;left:20%;right:20%;
-  height:2px;background:var(--grn);border-radius:2px 2px 0 0}
-#tabPanels{flex:1;overflow:hidden;position:relative}
-.tp{position:absolute;inset:0;overflow-y:auto;padding:11px;display:none;
-  -webkit-overflow-scrolling:touch}
-.tp::-webkit-scrollbar{display:none}
-.tp.on{display:block}
-.mrow{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:12px}
-.mcell{background:var(--surf2);border-radius:var(--rs);padding:9px 6px;text-align:center}
-.mcv{font-size:1.1rem;font-weight:700;font-variant-numeric:tabular-nums}
-.mcl{font-size:.57rem;color:var(--mut);text-transform:uppercase;margin-top:2px}
-
-/* MOBILE FABs — position:fixed so they always sit above everything */
-#fabArea{
-  display:none;
-  position:fixed;           /* FIX: fixed, not absolute */
-  bottom:calc(14px + var(--sb));
-  right:14px;
-  flex-direction:column;
-  align-items:flex-end;
-  gap:9px;
-  z-index:200;              /* above everything */
-}
-.fab{display:flex;align-items:center;gap:8px;padding:11px 16px;
-  border-radius:999px;border:none;font-size:.82rem;font-weight:700;
-  cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,.5);white-space:nowrap;
-  -webkit-tap-highlight-color:transparent}
-.fab:active{transform:scale(.95)}
-.fab-g{background:var(--grn);color:#000}
-.fab-r{background:var(--red);color:#fff}
-.fab-s{background:var(--surf2);color:var(--txt);border:1px solid var(--bdr)}
-.fab-b{background:var(--blu);color:#fff}
-.fab-y{background:var(--ylw);color:#000}
-
-/* REPORT SHEET */
-#reportModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);
-  z-index:300;align-items:flex-end;justify-content:center}
-#reportModal.open{display:flex}
-.rsheet{background:var(--surf);border:1px solid var(--bdr);border-radius:20px 20px 0 0;
-  width:100%;max-width:600px;max-height:88dvh;display:flex;flex-direction:column;
-  animation:sheetUp .28s cubic-bezier(.2,.8,.3,1);padding-bottom:var(--sb)}
-@keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.rhandle{width:38px;height:4px;background:var(--bdr);border-radius:2px;
-  margin:10px auto 0;flex-shrink:0}
-.rhead{display:flex;justify-content:space-between;align-items:center;
-  padding:12px 18px 10px;border-bottom:1px solid var(--bdr);flex-shrink:0}
-.rtitle{font-size:1.05rem;font-weight:700}
-.rbody{flex:1;overflow-y:auto;padding:14px 18px;-webkit-overflow-scrolling:touch}
-.rbody::-webkit-scrollbar{width:3px}
-.rbody::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:2px}
-.rgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:18px}
-.rc{background:var(--surf2);border-radius:var(--r);padding:11px 8px;text-align:center}
-.rv{font-size:1.4rem;font-weight:800;color:var(--grn);line-height:1}
-.rl{font-size:.6rem;color:var(--mut);margin-top:3px}
-.rsec{font-size:.6rem;font-weight:700;text-transform:uppercase;
-  letter-spacing:1px;color:var(--mut);margin-bottom:8px}
-.rbar{display:flex;align-items:center;gap:9px;margin-bottom:7px}
-.rbl{width:64px;font-size:.76rem;font-weight:600}
-.rbt{flex:1;height:7px;background:var(--surf2);border-radius:3px;overflow:hidden}
-.rbf{height:100%;border-radius:3px;transition:width .7s ease}
-.rbn{width:20px;text-align:right;font-size:.74rem;color:var(--mut)}
-.rtip{display:flex;gap:8px;align-items:flex-start;padding:9px;
-  background:var(--surf2);border-radius:var(--rs);font-size:.78rem;line-height:1.4;margin-bottom:7px}
-.rtip span{font-size:.9rem;flex-shrink:0}
-
-.hidden{display:none!important}
-
-/* RESPONSIVE */
-@media(max-width:767px){
-  #main{flex-direction:column}
-  /* landscape default: height proportional to width */
-  #vs{width:100%;flex-shrink:0;height:56.25vw;max-height:50dvh}
-  /* portrait video: taller */
-  #vs.portrait{height:calc(100vw * 16/9);max-height:64dvh}
-  #flipBtn{display:flex}
-  #dskBar,#stBar{display:none}
-  #mobPanel,#fabArea{display:flex}
-  .donly{display:none!important}
-  .rgrid{grid-template-columns:repeat(2,1fr)}
-}
-@media(min-width:768px){
-  #vs{flex:1}
-  #dskBar{display:flex}
-  #stBar{display:flex}
-  #flipBtn{display:flex}
-  .monly{display:none!important}
-}
-@media(min-width:768px) and (max-width:1023px){#dskBar{width:256px}}
+  body { font-family:'Geist',system-ui,-apple-system,sans-serif; min-height:100dvh }
+  html,body { overflow:hidden; height:100%; height:100dvh }
 </style>
 </head>
-<body>
 
-<!-- HEADER -->
-<div id="hdr">
-  <div class="logo">PikBe<span>Boi</span> 🏓</div>
-  <div class="hrow">
-    <select class="pill" id="handSel">
-      <option value="right">✋ Right</option>
-      <option value="left">🤚 Left</option>
-    </select>
-    <button class="btn bg donly" id="btnCam"    onclick="startCam()">📷 Camera</button>
-    <button class="btn bs donly" id="btnUpload" onclick="pickFile()">📁 Upload</button>
-    <button class="btn br hidden donly" id="btnStop"    onclick="stopSess()">⏹ Stop</button>
-    <button class="btn bb hidden donly" id="btnReport"  onclick="openReport()">📊 Report</button>
-    <button class="btn by hidden donly" id="btnRewatch" onclick="startRewatch()">▶ Rewatch</button>
-    <button class="ibtn monly hidden" id="mBtnReport" onclick="openReport()">📊</button>
+<body class="bg-background text-on-surface flex flex-col" style="height:100dvh">
+
+<!-- ═══════════════════════════════════════════
+     HEADER
+═══════════════════════════════════════════ -->
+<header id="hdr"
+  class="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-4 safe-top h-safe-top
+         bg-surface border-b border-outline-variant">
+  <!-- Logo -->
+  <div class="flex items-center gap-2">
+    <span class="material-symbols-outlined text-primary-fixed text-[22px]">sports_tennis</span>
+    <span class="text-[22px] font-bold text-primary-fixed tracking-tight leading-none">PikBeBoi</span>
   </div>
-  <input type="file" id="fileInput" accept="video/*"
-         style="display:none" onchange="loadFile(event)">
-</div>
+  <!-- Controls -->
+  <div class="flex items-center gap-1.5">
+    <!-- Hand toggle -->
+    <div class="flex bg-surface-variant rounded-full p-0.5 border border-outline-variant">
+      <button id="btnHandR" onclick="setHand('right')"
+        class="px-3 py-1 rounded-full text-[13px] font-semibold tracking-wide flex items-center gap-1
+               bg-surface-container-highest text-primary-fixed transition-colors">
+        ✋ Right
+      </button>
+      <button id="btnHandL" onclick="setHand('left')"
+        class="px-3 py-1 rounded-full text-[13px] font-semibold tracking-wide flex items-center gap-1
+               text-on-surface-variant transition-colors hover:bg-surface-container">
+        🤚 Left
+      </button>
+    </div>
+    <!-- Desktop action buttons -->
+    <button id="btnCam" onclick="startCam()"
+      class="hidden md:flex items-center gap-1.5 px-4 py-2 rounded-full text-[13px] font-semibold
+             bg-primary-container text-on-primary glow-green-sm transition-all hover:brightness-110 active:scale-95">
+      <span class="material-symbols-outlined text-[18px] icon-fill">videocam</span> Camera
+    </button>
+    <button id="btnUpload" onclick="pickFile()"
+      class="hidden md:flex items-center gap-1.5 px-4 py-2 rounded-full text-[13px] font-semibold
+             bg-surface-variant text-on-surface border border-outline-variant transition-all hover:bg-surface-container-high active:scale-95">
+      <span class="material-symbols-outlined text-[18px]">file_upload</span> Upload
+    </button>
+    <button id="btnStop" onclick="stopSess()"
+      class="hidden md:flex items-center gap-1.5 px-4 py-2 rounded-full text-[13px] font-semibold
+             bg-error-container text-on-error-container transition-all hover:brightness-110 active:scale-95">
+      <span class="material-symbols-outlined text-[18px] icon-fill">stop</span> Stop
+    </button>
+    <button id="btnReport" onclick="openReport()"
+      class="hidden md:flex items-center gap-1.5 px-4 py-2 rounded-full text-[13px] font-semibold
+             bg-surface-variant text-primary-fixed border border-primary-fixed/30 transition-all active:scale-95">
+      <span class="material-symbols-outlined text-[18px]">analytics</span> Report
+    </button>
+    <button id="btnRewatch" onclick="startRewatch()"
+      class="hidden md:flex items-center gap-1.5 px-4 py-2 rounded-full text-[13px] font-semibold
+             bg-secondary-container text-on-secondary-container transition-all active:scale-95">
+      <span class="material-symbols-outlined text-[18px] icon-fill">play_circle</span> Rewatch
+    </button>
+    <!-- Mobile report icon -->
+    <button id="mBtnReport" onclick="openReport()"
+      class="hidden md:hidden w-9 h-9 flex items-center justify-center rounded-full
+             hover:bg-surface-variant transition-colors active:scale-95">
+      <span class="material-symbols-outlined text-on-surface text-[22px]">analytics</span>
+    </button>
+  </div>
+  <input type="file" id="fileInput" accept="video/*" class="hidden" onchange="loadFile(event)">
+</header>
 
-<!-- MAIN -->
-<div id="main">
+<!-- ═══════════════════════════════════════════
+     MAIN
+═══════════════════════════════════════════ -->
+<div id="main" class="flex flex-1 overflow-hidden" style="margin-top:calc(52px + env(safe-area-inset-top,0px))">
 
-  <!-- Video -->
-  <div id="vs">
-    <div id="sp"><div class="e">🏓</div>
-      <p>Tap <strong>Camera</strong> or upload<br>to analyze your technique</p></div>
+  <!-- VIDEO SECTION -->
+  <section id="vs"
+    class="relative bg-surface-container-lowest overflow-hidden flex-shrink-0 md:flex-1"
+    style="width:100%;height:56.25vw;max-height:50dvh">
 
-    <video id="videoEl" playsinline muted></video>
-    <!-- Transparent skeleton canvas — pointer-events:none -->
-    <canvas id="oc"></canvas>
-    <!-- Transparent tap target for person selection -->
-    <div id="tapDiv"></div>
+    <!-- Video (visible background) -->
+    <video id="videoEl" playsinline muted class="hidden w-full h-full object-contain bg-black"></video>
+    <!-- Transparent skeleton canvas (pointer-events:none) -->
+    <canvas id="oc" class="absolute inset-0 w-full h-full hidden" style="pointer-events:none"></canvas>
+    <!-- Tap overlay for person selection -->
+    <div id="tapDiv" class="absolute inset-0 z-[5] hidden cursor-crosshair"></div>
 
-    <div id="shotBadge"></div>
-    <div id="ratingPop"></div>
-    <div id="selHint">👆 Tap a player to track</div>
-    <div id="pcBadge"></div>
-    <button id="flipBtn" onclick="flipCam()">🔄</button>
+    <!-- Start prompt -->
+    <div id="sp" class="absolute inset-0 flex flex-col items-center justify-center text-center p-5 text-on-surface-variant pointer-events-none z-[3]">
+      <span class="material-symbols-outlined text-primary-fixed text-[56px] mb-3 opacity-60">sports_tennis</span>
+      <p class="text-[15px] leading-relaxed">Tap <strong class="text-primary-fixed">Camera</strong> or upload a video<br>to analyze your technique</p>
+    </div>
 
-    <!-- Rewatch scrubber -->
-    <div id="rwBar">
-      <div id="scrubWrap"
-           onmousedown="scrubStart(event)"
-           ontouchstart="scrubStart(event)">
-        <div id="scrubTrack">
-          <div id="scrubFill"></div>
-          <div id="scrubMarks"></div>
-          <div id="scrubThumb"></div>
+    <!-- Shot badge -->
+    <div id="shotBadge"
+      class="absolute top-3 left-1/2 -translate-x-1/2 hidden z-10 pointer-events-none
+             bg-surface/80 backdrop-blur-md border-2 border-primary-fixed rounded-full
+             px-5 py-1.5 text-[13px] font-bold text-primary-fixed tracking-[0.12em] uppercase"
+      style="text-shadow:0 0 8px rgba(96,255,153,.5)"></div>
+
+    <!-- Rating pop -->
+    <div id="ratingPop"
+      class="absolute bottom-16 left-1/2 -translate-x-1/2 hidden z-10 pointer-events-none
+             bg-black/70 backdrop-blur-sm rounded-full px-4 py-1.5
+             text-secondary-container text-[18px] tracking-[0.15em]"></div>
+
+    <!-- Select hint -->
+    <div id="selHint"
+      class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 hidden z-[11] pointer-events-none
+             bg-black/75 backdrop-blur-md text-on-surface rounded-xl px-4 py-2
+             text-[13px] text-center whitespace-nowrap border border-outline-variant">
+      👆 Tap a player to track
+    </div>
+
+    <!-- Person count -->
+    <div id="pcBadge"
+      class="absolute top-3 right-11 hidden z-[11] pointer-events-none
+             bg-surface/75 backdrop-blur-md border border-outline-variant rounded-full
+             px-3 py-1 text-[12px] font-medium text-on-surface flex items-center gap-1">
+      <span class="material-symbols-outlined text-[14px]">person</span>
+    </div>
+
+    <!-- Flip camera -->
+    <button id="flipBtn" onclick="flipCam()"
+      class="absolute top-3 right-3 hidden z-[15] w-9 h-9 rounded-full
+             bg-black/60 backdrop-blur-sm border border-white/20 text-white
+             items-center justify-center transition-all active:scale-90">
+      <span class="material-symbols-outlined text-[20px]">sync</span>
+    </button>
+
+    <!-- ── Rewatch scrubber bar ── -->
+    <div id="rwBar"
+      class="absolute bottom-0 left-0 w-full hidden z-[16]
+             bg-surface-container/80 backdrop-blur-xl border-t border-outline-variant p-3 flex flex-col gap-2">
+      <!-- Track -->
+      <div id="scrubWrap" class="relative h-6 cursor-pointer flex items-center"
+           onmousedown="scrubStart(event)" ontouchstart="scrubStart(event)">
+        <div id="scrubTrack" class="absolute left-0 right-0 h-1 bg-outline-variant rounded-full">
+          <div id="scrubFill" class="h-full bg-primary-fixed rounded-full" style="width:0%"></div>
+          <div id="scrubMarks" class="absolute inset-0 pointer-events-none"></div>
+          <div id="scrubThumb"
+            class="absolute top-1/2 -translate-y-1/2 w-3.5 h-3.5 bg-white rounded-full border-2 border-primary-fixed shadow-lg"
+            style="left:0%;transform:translate(-50%,-50%)"></div>
         </div>
       </div>
-      <div id="rwRow">
-        <span id="rwTime">0:00 / 0:00</span>
-        <div>
-          <button class="rwb" onclick="rwRestart()">⏮</button>
-          <button class="rwb" id="rwPlayBtn" onclick="rwToggle()">⏸</button>
-          <button class="rwb" onclick="closeRewatch()">✕</button>
+      <!-- Controls -->
+      <div class="flex items-center justify-between">
+        <span id="rwTime" class="text-[12px] font-medium text-on-surface-variant tabular-nums">0:00 / 0:00</span>
+        <div class="flex items-center gap-1">
+          <button onclick="rwRestart()"
+            class="text-on-surface hover:text-primary-fixed transition-colors p-1">
+            <span class="material-symbols-outlined text-[22px]">replay_10</span>
+          </button>
+          <button id="rwPlayBtn" onclick="rwToggle()"
+            class="w-9 h-9 flex items-center justify-center bg-primary-fixed text-on-primary rounded-full
+                   active:scale-90 transition-transform glow-green-sm">
+            <span class="material-symbols-outlined text-[20px] icon-fill">pause</span>
+          </button>
+          <button onclick="closeRewatch()"
+            class="text-on-surface-variant hover:text-error transition-colors p-1">
+            <span class="material-symbols-outlined text-[22px]">close</span>
+          </button>
         </div>
       </div>
     </div>
 
-    <div id="loadOverlay">
-      <div class="spinner"></div>
-      <div id="loadTxt">Loading AI model…</div>
+    <!-- Loading overlay -->
+    <div id="loadOverlay"
+      class="absolute inset-0 bg-black/85 hidden flex-col items-center justify-center z-20">
+      <div class="w-9 h-9 rounded-full border-[3px] border-outline-variant border-t-primary-fixed
+                  animate-spin mb-3"></div>
+      <p id="loadTxt" class="text-[13px] text-on-surface-variant text-center px-5">Loading AI model…</p>
     </div>
-  </div>
+  </section>
 
-  <!-- Desktop Sidebar -->
-  <div id="dskBar">
-    <div class="dss">
-      <div class="lbl">Shot Breakdown</div>
-      <div class="sgrid" id="dGrid"></div>
+  <!-- DESKTOP SIDEBAR (hidden on mobile) -->
+  <aside id="dskBar"
+    class="hidden md:flex flex-col w-72 bg-surface border-l border-outline-variant overflow-hidden flex-shrink-0">
+
+    <!-- Shot counts -->
+    <div class="p-4 border-b border-outline-variant flex-shrink-0">
+      <div class="flex items-center gap-2 mb-3">
+        <div class="w-1 h-4 bg-primary-fixed rounded-full"></div>
+        <span class="text-[11px] font-semibold tracking-widest text-on-surface-variant uppercase">Shot Distribution</span>
+      </div>
+      <div class="grid grid-cols-3 gap-1" id="dGrid"></div>
     </div>
-    <div class="dss">
-      <div class="lbl">Technique Feedback</div>
-      <div id="dFb"><p class="tmut">Hit some shots…</p></div>
+
+    <!-- Feedback -->
+    <div class="p-4 border-b border-outline-variant flex-shrink-0">
+      <span class="text-[11px] font-semibold tracking-widest text-on-surface-variant uppercase block mb-3">Technique Feedback</span>
+      <div id="dFb"><p class="text-[13px] text-on-surface-variant">Hit some shots…</p></div>
     </div>
-    <div class="dss">
-      <div class="lbl">Drill to Improve</div>
-      <div id="dEx"><p class="tmut">Drills appear after shots…</p></div>
+
+    <!-- Drill -->
+    <div class="p-4 border-b border-outline-variant flex-shrink-0">
+      <span class="text-[11px] font-semibold tracking-widest text-on-surface-variant uppercase block mb-3">Drill to Improve</span>
+      <div id="dEx"><p class="text-[13px] text-on-surface-variant">Drills appear after shots…</p></div>
     </div>
-    <div class="dscroll">
-      <div class="lbl">Recent Shots</div>
+
+    <!-- History -->
+    <div class="flex-1 overflow-y-auto p-3">
+      <span class="text-[11px] font-semibold tracking-widest text-on-surface-variant uppercase block mb-2 px-1">Recent Shots</span>
       <div id="dHist"></div>
     </div>
-  </div>
+  </aside>
+</div><!-- #main -->
+
+<!-- DESKTOP STATS BAR -->
+<div id="stBar"
+  class="hidden md:flex items-center gap-5 px-5 py-2 bg-surface border-t border-outline-variant flex-shrink-0"
+  style="padding-bottom:calc(8px + env(safe-area-inset-bottom,0px))">
+  <div class="w-2 h-2 rounded-full bg-error hidden animate-pulse" id="recDot"
+       style="animation:blink 1.4s infinite"></div>
+  <div><div class="text-[15px] font-bold tabular-nums" id="sTot">0</div><div class="text-[10px] text-on-surface-variant uppercase tracking-wider">Shots</div></div>
+  <div class="w-px h-6 bg-outline-variant"></div>
+  <div><div class="text-[15px] font-bold tabular-nums" id="sDur">0:00</div><div class="text-[10px] text-on-surface-variant uppercase tracking-wider">Duration</div></div>
+  <div class="w-px h-6 bg-outline-variant"></div>
+  <div><div class="text-[15px] font-bold tabular-nums" id="sTop">—</div><div class="text-[10px] text-on-surface-variant uppercase tracking-wider">Most Common</div></div>
+  <div class="w-px h-6 bg-outline-variant"></div>
+  <div><div class="text-[15px] font-bold tabular-nums" id="sLast">—</div><div class="text-[10px] text-on-surface-variant uppercase tracking-wider">Last Shot</div></div>
+  <style>@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}</style>
 </div>
 
-<!-- STATS BAR (desktop) -->
-<div id="stBar">
-  <div class="recdot" id="recDot"></div>
-  <div><div class="sv" id="sTot">0</div><div class="sl">Shots</div></div>
-  <div class="sdv"></div>
-  <div><div class="sv" id="sDur">0:00</div><div class="sl">Duration</div></div>
-  <div class="sdv"></div>
-  <div><div class="sv" id="sTop">—</div><div class="sl">Most Common</div></div>
-  <div class="sdv"></div>
-  <div><div class="sv" id="sLast">—</div><div class="sl">Last Shot</div></div>
-</div>
+<!-- ═══════════════════════════════════════════
+     MOBILE PANEL (tabs)
+═══════════════════════════════════════════ -->
+<div id="mobPanel"
+  class="flex md:hidden flex-col flex-1 bg-surface overflow-hidden border-t border-outline-variant">
 
-<!-- MOBILE PANEL -->
-<div id="mobPanel">
-  <div id="tabBar">
-    <button class="tb on" id="tab-s" onclick="switchTab('s')">
-      <span class="ti">📊</span>Stats</button>
-    <button class="tb" id="tab-h" onclick="switchTab('h')">
-      <span class="ti">🕒</span>History</button>
-    <button class="tb" id="tab-d" onclick="switchTab('d')">
-      <span class="ti">🎯</span>Drill</button>
+  <!-- Tab bar -->
+  <div class="flex border-b border-outline-variant flex-shrink-0 bg-surface-container">
+    <button class="tab-on flex-1 flex flex-col items-center py-2.5 gap-0.5 transition-colors" id="tab-s" onclick="switchTab('s')">
+      <span class="material-symbols-outlined text-[22px]">analytics</span>
+      <span class="text-[11px] font-semibold">Stats</span>
+    </button>
+    <button class="tab-off flex-1 flex flex-col items-center py-2.5 gap-0.5 transition-colors" id="tab-h" onclick="switchTab('h')">
+      <span class="material-symbols-outlined text-[22px]">history</span>
+      <span class="text-[11px] font-semibold">History</span>
+    </button>
+    <button class="tab-off flex-1 flex flex-col items-center py-2.5 gap-0.5 transition-colors" id="tab-d" onclick="switchTab('d')">
+      <span class="material-symbols-outlined text-[22px]">fitness_center</span>
+      <span class="text-[11px] font-semibold">Drill</span>
+    </button>
   </div>
-  <div id="tabPanels">
-    <div class="tp on" id="tp-s">
-      <div class="mrow">
-        <div class="mcell"><div class="mcv" id="mTot">0</div><div class="mcl">Shots</div></div>
-        <div class="mcell"><div class="mcv" id="mDur">0:00</div><div class="mcl">Time</div></div>
-        <div class="mcell"><div class="mcv" id="mTop">—</div><div class="mcl">Top Shot</div></div>
+
+  <!-- Panels -->
+  <div class="flex-1 overflow-hidden relative">
+
+    <!-- Stats panel -->
+    <div class="tab-panel absolute inset-0 overflow-y-auto p-4 flex flex-col gap-4" id="tp-s">
+
+      <!-- Quick metrics -->
+      <div class="grid grid-cols-3 gap-3">
+        <div class="bg-surface-container border border-outline-variant rounded-lg p-3 flex flex-col">
+          <span class="text-[10px] font-semibold tracking-widest text-on-surface-variant uppercase mb-1">Shots</span>
+          <span class="text-[22px] font-bold text-primary-fixed text-glow tabular-nums" id="mTot">0</span>
+        </div>
+        <div class="bg-surface-container border border-outline-variant rounded-lg p-3 flex flex-col">
+          <span class="text-[10px] font-semibold tracking-widest text-on-surface-variant uppercase mb-1">Time</span>
+          <span class="text-[22px] font-bold text-on-surface tabular-nums" id="mDur">0:00</span>
+        </div>
+        <div class="bg-surface-container border border-outline-variant rounded-lg p-3 flex flex-col">
+          <span class="text-[10px] font-semibold tracking-widest text-on-surface-variant uppercase mb-1">Top Shot</span>
+          <span class="text-[18px] font-bold text-secondary-container tabular-nums" id="mTop">—</span>
+        </div>
       </div>
-      <div class="lbl">Shot Breakdown</div>
-      <div class="sgrid" id="mGrid" style="margin-bottom:12px"></div>
-      <div class="lbl">Feedback</div>
-      <div id="mFb"><p class="tmut">Hit some shots…</p></div>
+
+      <!-- Shot grid header -->
+      <div>
+        <div class="flex items-center gap-2 mb-2">
+          <div class="w-1 h-4 bg-primary-fixed rounded-full"></div>
+          <span class="text-[11px] font-semibold tracking-widest text-on-surface-variant uppercase">Shot Distribution</span>
+        </div>
+        <div class="grid grid-cols-3 gap-1" id="mGrid"></div>
+      </div>
+
+      <!-- Feedback -->
+      <div>
+        <span class="text-[11px] font-semibold tracking-widest text-on-surface-variant uppercase block mb-2">Technique Feedback</span>
+        <div id="mFb" class="flex flex-col gap-2">
+          <p class="text-[13px] text-on-surface-variant">Hit some shots to get feedback…</p>
+        </div>
+      </div>
     </div>
-    <div class="tp" id="tp-h">
-      <div class="lbl">Recent Shots</div>
+
+    <!-- History panel -->
+    <div class="tab-panel absolute inset-0 overflow-y-auto p-4 hidden" id="tp-h">
+      <span class="text-[11px] font-semibold tracking-widest text-on-surface-variant uppercase block mb-3">Recent Shots</span>
       <div id="mHist"></div>
     </div>
-    <div class="tp" id="tp-d">
-      <div class="lbl">Drill to Improve</div>
-      <div id="mEx"><p class="tmut">Drills appear after shots…</p></div>
+
+    <!-- Drill panel -->
+    <div class="tab-panel absolute inset-0 overflow-y-auto p-4 hidden" id="tp-d">
+      <span class="text-[11px] font-semibold tracking-widest text-on-surface-variant uppercase block mb-3">Drill to Improve</span>
+      <div id="mEx"><p class="text-[13px] text-on-surface-variant">Drills appear after shots are detected…</p></div>
     </div>
   </div>
 </div>
 
-<!-- MOBILE FABs (position:fixed) -->
-<div id="fabArea">
-  <button class="fab fab-b hidden" id="mFabRep"   onclick="openReport()">📊 Report</button>
-  <button class="fab fab-y hidden" id="mFabRw"    onclick="startRewatch()">▶ Rewatch</button>
-  <button class="fab fab-r hidden" id="mFabStop"  onclick="stopSess()">⏹ Stop</button>
-  <button class="fab fab-s"        id="mFabUp"    onclick="pickFile()">📁 Upload</button>
-  <button class="fab fab-g"        id="mFabCam"   onclick="startCam()">📷 Camera</button>
+<!-- ═══════════════════════════════════════════
+     MOBILE FABs (fixed)
+═══════════════════════════════════════════ -->
+<div id="fabArea"
+  class="flex md:hidden fixed flex-col items-end gap-2.5 z-[200]"
+  style="bottom:calc(14px + env(safe-area-inset-bottom,0px));right:16px">
+
+  <button id="mFabRep" onclick="openReport()"
+    class="hidden items-center gap-2 px-5 py-3 rounded-full text-[13px] font-bold shadow-2xl
+           bg-surface-variant text-primary-fixed border border-primary-fixed/40 active:scale-95 transition-transform">
+    <span class="material-symbols-outlined text-[20px]">analytics</span> Report
+  </button>
+  <button id="mFabRw" onclick="startRewatch()"
+    class="hidden items-center gap-2 px-5 py-3 rounded-full text-[13px] font-bold shadow-2xl
+           bg-secondary-container text-on-secondary-container active:scale-95 transition-transform">
+    <span class="material-symbols-outlined text-[20px] icon-fill">play_circle</span> Rewatch
+  </button>
+  <button id="mFabStop" onclick="stopSess()"
+    class="hidden items-center gap-2 px-5 py-3 rounded-full text-[13px] font-bold shadow-2xl
+           bg-error-container text-on-error-container active:scale-95 transition-transform">
+    <span class="material-symbols-outlined text-[20px] icon-fill">stop</span> Stop
+  </button>
+  <button id="mFabUp" onclick="pickFile()"
+    class="flex items-center gap-2 px-5 py-3 rounded-full text-[13px] font-bold shadow-xl
+           bg-surface-variant text-on-surface border border-outline-variant active:scale-95 transition-transform">
+    <span class="material-symbols-outlined text-[20px]">file_upload</span> Upload
+  </button>
+  <button id="mFabCam" onclick="startCam()"
+    class="flex items-center gap-2.5 px-6 py-3.5 rounded-full text-[14px] font-bold shadow-2xl glow-green
+           bg-primary-container text-on-primary active:scale-95 transition-transform">
+    <span class="material-symbols-outlined text-[22px] icon-fill">videocam</span> Camera
+  </button>
 </div>
 
-<!-- REPORT MODAL -->
-<div id="reportModal">
-  <div class="rsheet" id="rSheet">
-    <div class="rhandle"></div>
-    <div class="rhead">
-      <div class="rtitle">📊 Session Report</div>
-      <button class="btn bs" onclick="closeReport()">✕</button>
+<!-- ═══════════════════════════════════════════
+     REPORT BOTTOM SHEET
+═══════════════════════════════════════════ -->
+<div id="reportModal" class="fixed inset-0 z-[300] hidden items-end justify-center">
+  <!-- Backdrop -->
+  <div id="rBackdrop" class="absolute inset-0 bg-black/65 backdrop-blur-sm"
+       onclick="closeReport()"></div>
+
+  <!-- Sheet -->
+  <div id="rSheet"
+    class="relative w-full max-w-2xl max-h-[88dvh] flex flex-col rounded-t-[20px] border-t border-outline-variant sheet-bg
+           overflow-hidden z-10"
+    style="animation:sheetUp .28s cubic-bezier(.2,.8,.3,1)">
+
+    <style>@keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}</style>
+
+    <!-- Handle -->
+    <div class="flex justify-center pt-3 pb-1 flex-shrink-0 cursor-grab">
+      <div class="w-10 h-1 bg-outline-variant rounded-full"></div>
     </div>
-    <div class="rbody">
-      <div class="rgrid" id="rGrid"></div>
-      <div class="rsec">Shot Distribution</div>
-      <div id="rBars" style="margin-bottom:18px"></div>
-      <div class="rsec">Technique Tips &amp; Drills</div>
-      <div id="rTips"></div>
+
+    <!-- Header -->
+    <div class="flex items-end justify-between px-4 pb-3 border-b border-outline-variant flex-shrink-0">
+      <div>
+        <p class="text-[11px] font-semibold tracking-widest text-primary-fixed uppercase mb-0.5">Performance Index</p>
+        <h2 class="text-[22px] font-bold text-on-surface">Session Report</h2>
+      </div>
+      <button onclick="closeReport()"
+        class="w-9 h-9 flex items-center justify-center rounded-full bg-surface-variant text-on-surface-variant
+               hover:bg-surface-container-high active:scale-90 transition-all">
+        <span class="material-symbols-outlined text-[20px]">close</span>
+      </button>
+    </div>
+
+    <!-- Scrollable body -->
+    <div class="flex-1 overflow-y-auto px-4 py-4 space-y-5"
+         style="padding-bottom:calc(20px + env(safe-area-inset-bottom,0px))">
+
+      <!-- 2×3 stats grid -->
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-3" id="rGrid"></div>
+
+      <!-- Shot distribution -->
+      <div class="bg-surface-container-low border border-outline-variant rounded-xl p-4 space-y-3">
+        <div class="flex justify-between items-center">
+          <h3 class="text-[11px] font-semibold tracking-widest text-on-surface uppercase">Shot Distribution</h3>
+          <span class="text-[11px] text-on-surface-variant">By Frequency</span>
+        </div>
+        <div id="rBars" class="space-y-2"></div>
+      </div>
+
+      <!-- Tips & drills -->
+      <div>
+        <h3 class="text-[11px] font-semibold tracking-widest text-on-surface uppercase mb-3">Technique Insights &amp; Drills</h3>
+        <div id="rTips" class="space-y-2"></div>
+      </div>
+
+      <!-- CTA -->
+      <button onclick="closeReport();startCam()"
+        class="w-full py-4 rounded-full bg-primary-container text-on-primary font-bold text-[15px]
+               glow-green active:scale-[.98] hover:brightness-110 transition-all">
+        START NEXT SESSION
+      </button>
     </div>
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════
+     SCRIPTS
+═══════════════════════════════════════════ -->
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.17.0/dist/tf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection@2.1.3/dist/pose-detection.min.js"></script>
 <script>
-// ═══════════════════════════════════════════════════════════════
-//  PikBeBoi  —  Pickleball Technique Analyzer
-//
-//  FIXES in this version:
-//  1. All utility functions defined FIRST (no TDZ crash)
-//  2. FABs use position:fixed (not absolute)
-//  3. Canvas has pointer-events:none; separate tapDiv handles selection
-//  4. Video element is visible (opacity 1) as background display
-// ═══════════════════════════════════════════════════════════════
+'use strict';
+// ═══════════════════════════════════════════════════════════
+//  PikBeBoi — Pickleball Technique Analyzer
+// ═══════════════════════════════════════════════════════════
 
-// ── Utilities (MUST be first — used everywhere below) ──────────
-const G   = id => document.getElementById(id);
-const sEl = (id, v) => { const e = G(id); if (e) e.textContent = v; };
-const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
-const fmt = s => `${Math.floor(s / 60)}:${Math.floor(s % 60).toString().padStart(2,'0')}`;
-const showLoad = msg => { sEl('loadTxt', msg || 'Loading…'); G('loadOverlay').style.display = 'flex'; };
-const hideLoad = ()  => { G('loadOverlay').style.display = 'none'; };
-const stars   = n => '★'.repeat(n) + '☆'.repeat(5 - n);
+// ── Utilities (defined first to avoid TDZ issues) ──────────
+const G    = id  => document.getElementById(id);
+const sEl  = (id,v) => { const e=G(id); if(e) e.textContent=v; };
+const cap  = s   => s.charAt(0).toUpperCase()+s.slice(1);
+const fmt  = s   => `${Math.floor(s/60)}:${Math.floor(s%60).toString().padStart(2,'0')}`;
+const show = el  => { if(el) el.style.display='flex'; };
+const hide = el  => { if(el) el.style.display='none'; };
+const showLoad = msg => { sEl('loadTxt',msg||'Loading…'); G('loadOverlay').style.display='flex'; };
+const hideLoad = ()  => { G('loadOverlay').style.display='none'; };
+const stars    = n   => '★'.repeat(n)+'☆'.repeat(5-n);
 
-// ── Config ─────────────────────────────────────────────────────
-const KP = {ns:0, ls:5, rs:6, le:7, re:8, lw:9, rw:10, lh:11, rh:12, lk:13, rk:14, la:15, ra:16};
+// ── Config ─────────────────────────────────────────────────
+const KP = {ns:0,ls:5,rs:6,le:7,re:8,lw:9,rw:10,lh:11,rh:12,lk:13,rk:14,la:15,ra:16};
 const SHOT_COLORS = {
-  dink:'#00ff88', volley:'#00aaff', smash:'#ff4455', reset:'#aa88ff',
-  drop:'#00ddcc', drive:'#ffcc00', lob:'#ff9944',   block:'#7788ff', flick:'#ff55cc'
+  dink:'#60ff99',volley:'#93ccff',smash:'#ffb4ab',reset:'#d4aaff',
+  drop:'#40e0d0',drive:'#fecb00',lob:'#ffb347',block:'#87ceeb',flick:'#ff80bf'
 };
 const SHOTS = ['dink','volley','smash','reset','drop','drive','lob','block','flick'];
-const T_START = 0.010, T_PEAK = 0.022, T_END = 0.007;
+const T_START=0.010, T_PEAK=0.022, T_END=0.007;
 
 const DRILLS = {
-  dink:  [{i:'🎯', d:'Cross-court dink rally — keep 50 consecutive without popping up'},
-          {i:'🦵', d:'Bend knees, eyes level with net — dink from an athletic stance'}],
-  volley:[{i:'👊', d:'Punch-volley wall drill — 3 ft from wall, 20 consecutive'},
-          {i:'🚶', d:'Crash-the-net: approach → split-step → punch volley, 10×'}],
-  smash: [{i:'🏋️', d:'Shadow overhead: toss, meet ball at highest point'},
-          {i:'🎯', d:'Placement — alternate crosscourt and down-the-line'}],
-  reset: [{i:'🧘', d:'Soft-hands: partner drives hard, absorb and land in kitchen'},
-          {i:'📐', d:'Continental grip — deadens pace on resets'}],
-  drop:  [{i:'🌊', d:'3rd-shot drop: serve → return → drop to kitchen, 20 reps'},
-          {i:'📏', d:'Clear net by 6 inches, land just past the kitchen line'}],
-  drive: [{i:'💪', d:'Drive-and-follow-in: drive flat then sprint to transition zone'},
-          {i:'🔄', d:'Hip-rotation shadows — load backfoot, unwind through contact'}],
-  lob:   [{i:'🌤️', d:'Aim for back 3 feet of court, disguise as a dink'},
-          {i:'🏃', d:'Lob-and-retreat: lob then immediately backpedal'}],
-  block: [{i:'🛡️', d:'Paddle out front drill: hold chest-high, let ball die on it'},
-          {i:'🤝', d:'Reflex block: partner bangs at you from mid-court'}],
-  flick: [{i:'⚡', d:'Wrist snap isolation: elbow on hip, snap wrist 30 reps each side'},
-          {i:'🎭', d:'Same dink setup — explode only in last 6 inches of swing'}],
+  dink:  [{i:'🎯',d:'Cross-court dink rally — keep 50 consecutive without popping up'},
+          {i:'🦵',d:'Bend knees, eyes level with net — dink from athletic stance'}],
+  volley:[{i:'👊',d:'Punch-volley wall drill — 3 ft from wall, 20 consecutive'},
+          {i:'🚶',d:'Crash-the-net: approach → split-step → punch volley, 10×'}],
+  smash: [{i:'🏋️',d:'Shadow overhead: toss, meet ball at highest contact point'},
+          {i:'🎯',d:'Placement drill — alternate crosscourt and down-the-line'}],
+  reset: [{i:'🧘',d:'Soft-hands: partner drives hard, absorb and land in kitchen'},
+          {i:'📐',d:'Continental grip — deadens pace on resets'}],
+  drop:  [{i:'🌊',d:'3rd-shot drop: serve → return → drop to kitchen, 20 reps'},
+          {i:'📏',d:'Clear net by 6 inches, land just past the kitchen line'}],
+  drive: [{i:'💪',d:'Drive-and-follow-in: drive flat then sprint to transition zone'},
+          {i:'🔄',d:'Hip-rotation shadows — load backfoot, unwind through contact'}],
+  lob:   [{i:'🌤️',d:'Aim for back 3 feet of court, disguise as a dink setup'},
+          {i:'🏃',d:'Lob-and-retreat: lob then immediately backpedal'}],
+  block: [{i:'🛡️',d:'Paddle out-front drill: hold chest-high, let ball die on it'},
+          {i:'🤝',d:'Reflex block: partner bangs at you from mid-court'}],
+  flick: [{i:'⚡',d:'Wrist snap isolation: elbow on hip, snap 30 reps each side'},
+          {i:'🎭',d:'Same dink setup — explode only in last 6 inches of swing'}],
 };
 
-// ── State ───────────────────────────────────────────────────────
-let det = null, running = false, rewatching = false;
-let hand = 'right', facing = 'environment';
-let mediaStream = null, rafId = null, busy = false, ticker = null;
-let poseHist = [], swState = 0, swData = null, cd = 0;
-let sess = { shots:[], t0: null };
-let counts = {}; SHOTS.forEach(t => counts[t] = 0);
-let activeTab = 's';
+// ── State ───────────────────────────────────────────────────
+let det=null, running=false, rewatching=false;
+let hand='right', facing='environment';
+let mediaStream=null, rafId=null, busy=false, ticker=null;
+let poseHist=[], swState=0, swData=null, cd=0;
+let sess={shots:[],t0:null}, counts={};
+SHOTS.forEach(t=>counts[t]=0);
+let activeTab='s';
+let lastPoses=[], selIdx=null, multiVisible=false;
+let vidW=0, vidH=0, isFile=false, rewatchURL=null;
+let shotTS=[], mrec=null, recChunks=[], scrubbing=false, lastFlash=-1;
 
-// Person tracking
-let lastPoses = [], selIdx = null, multiVisible = false;
-
-// Video
-let vidW = 0, vidH = 0, isFile = false, rewatchURL = null;
-let shotTimestamps = [];
-let mrec = null, recChunks = [];
-let scrubbing = false, lastFlash = -1;
-
-// ── Build shot grids ────────────────────────────────────────────
-(function buildGrids() {
-  const row = (pfx) => SHOTS.map(t =>
-    `<div class="sc" id="${pfx}c-${t}">
-       <div class="scn" id="${pfx}n-${t}">0</div>
-       <div class="scl">${cap(t)}</div>
-     </div>`).join('');
-  G('dGrid').innerHTML = row('d');
-  G('mGrid').innerHTML = row('m');
+// ── Build shot grids ────────────────────────────────────────
+(function buildGrids(){
+  const card = (pfx,t) => `
+    <button class="sc bg-surface-container border border-outline-variant rounded aspect-square
+                   flex flex-col items-center justify-center p-1 hover:bg-surface-variant
+                   transition-colors cursor-pointer group" id="${pfx}c-${t}">
+      <span class="text-[11px] font-semibold tracking-wide text-on-surface-variant uppercase
+                   group-hover:text-primary-fixed transition-colors leading-tight">${cap(t)}</span>
+      <span class="text-[22px] font-bold mt-0.5" id="${pfx}n-${t}">0</span>
+    </button>`;
+  G('dGrid').innerHTML = SHOTS.map(t=>card('d',t)).join('');
+  G('mGrid').innerHTML = SHOTS.map(t=>card('m',t)).join('');
 })();
 
-// ── Detector ────────────────────────────────────────────────────
+// ── Hand selector ────────────────────────────────────────────
+function setHand(h) {
+  hand = h;
+  ['R','L'].forEach(x => {
+    const el = G('btnHand'+x);
+    if (!el) return;
+    if ((x==='R'&&h==='right')||(x==='L'&&h==='left')) {
+      el.classList.add('bg-surface-container-highest','text-primary-fixed');
+      el.classList.remove('text-on-surface-variant');
+    } else {
+      el.classList.remove('bg-surface-container-highest','text-primary-fixed');
+      el.classList.add('text-on-surface-variant');
+    }
+  });
+}
+
+// ── Detector ────────────────────────────────────────────────
 async function initDet() {
   if (det) return;
   showLoad('Loading AI model (first run ~8s)…');
@@ -514,659 +588,585 @@ async function initDet() {
   det = await poseDetection.createDetector(
     poseDetection.SupportedModels.MoveNet,
     { modelType: poseDetection.movenet.modelType.MULTIPOSE_LIGHTNING,
-      enableTracking: true,
-      trackerType: poseDetection.TrackerType.BoundingBox,
-      trackerConfig: { maxTracks: 4, trackTimeout: 500 } }
+      enableTracking:true,
+      trackerType:poseDetection.TrackerType.BoundingBox,
+      trackerConfig:{maxTracks:4,trackTimeout:500} }
   );
   hideLoad();
 }
 
-// ── Camera ──────────────────────────────────────────────────────
+// ── Camera ──────────────────────────────────────────────────
 async function startCam() {
   stopSess(false);
-  hand = G('handSel').value;
   await initDet();
   showLoad('Requesting camera…');
   try {
     mediaStream = await navigator.mediaDevices.getUserMedia(
-      { video: { facingMode: facing, width:{ideal:1280}, height:{ideal:720} }, audio: false });
-  } catch(e) { hideLoad(); alert('Camera error: ' + e.message); return; }
+      {video:{facingMode:facing,width:{ideal:1280},height:{ideal:720}},audio:false});
+  } catch(e) { hideLoad(); alert('Camera error: '+e.message); return; }
   const vid = G('videoEl');
-  vid.srcObject = mediaStream;
-  vid.style.display = 'block';
+  vid.srcObject = mediaStream; vid.style.display='block';
   vid.onloadedmetadata = () => {
-    vid.play().catch(() => {});
+    vid.play().catch(()=>{});
     setupDisplay(vid.videoWidth, vid.videoHeight);
-    hideLoad();
-    startMRec(mediaStream);
-    beginSess();
-    mainLoop();
+    hideLoad(); startMRec(mediaStream); beginSess(); mainLoop();
   };
 }
 
 async function flipCam() {
-  facing = facing === 'environment' ? 'user' : 'environment';
+  facing = facing==='environment'?'user':'environment';
   if (running && mediaStream) await startCam();
 }
 
-// ── Video file ───────────────────────────────────────────────────
+// ── Video file ────────────────────────────────────────────────
 function pickFile() { G('fileInput').click(); }
-
 async function loadFile(ev) {
-  const file = ev.target.files[0]; ev.target.value = ''; if (!file) return;
-  stopSess(false);
-  hand = G('handSel').value;
+  const file=ev.target.files[0]; ev.target.value=''; if(!file) return;
+  stopSess(false); isFile=true;
   await initDet();
-  isFile = true;
-  const vid = G('videoEl');
-  vid.srcObject = null;
-  vid.removeAttribute('src');
-  vid.load();
+  const vid=G('videoEl');
+  vid.srcObject=null; vid.removeAttribute('src'); vid.load();
   rewatchURL = URL.createObjectURL(file);
-  vid.src = rewatchURL;
-  vid.style.display = 'block';
-  vid.onloadedmetadata = () => setupDisplay(vid.videoWidth, vid.videoHeight);
-  vid.oncanplaythrough = () => {
-    vid.oncanplaythrough = null;
-    beginSess();
-    vid.play()
-      .then(() => mainLoop())
-      .catch(() => showTapToPlay());
+  vid.src = rewatchURL; vid.style.display='block';
+  vid.onloadedmetadata = ()=>setupDisplay(vid.videoWidth,vid.videoHeight);
+  vid.oncanplaythrough = ()=>{
+    vid.oncanplaythrough=null; beginSess();
+    vid.play().then(()=>mainLoop()).catch(()=>showTapToPlay());
   };
 }
 
 function showTapToPlay() {
-  const sp = G('sp');
-  sp.innerHTML = '<div class="e">▶</div><p>Tap to start</p>';
-  sp.style.display = 'flex';
-  sp.classList.add('tappable');
-  sp.onclick = () => {
-    G('videoEl').play().then(() => {
-      sp.style.display = 'none';
-      sp.classList.remove('tappable');
-      sp.onclick = null;
-      mainLoop();
-    }).catch(() => {});
-  };
+  const sp=G('sp');
+  sp.innerHTML=`<span class="material-symbols-outlined text-primary-fixed text-[64px] icon-fill mb-2">play_circle</span>
+    <p class="text-[15px]">Tap to start analysis</p>`;
+  sp.style.display='flex'; sp.style.pointerEvents='auto'; sp.style.cursor='pointer';
+  sp.onclick=()=>{ G('videoEl').play().then(()=>{ sp.style.display='none'; sp.onclick=null; mainLoop(); }).catch(()=>{}); };
 }
 
-// ── Display setup ────────────────────────────────────────────────
-function setupDisplay(w, h) {
-  vidW = w; vidH = h;
-  G('vs').classList.toggle('portrait', h > w);
-  // Size canvas to video section after layout settles
-  G('sp').style.display = 'none';
-  G('oc').style.display = 'block';
-  G('tapDiv').style.display = 'block';
-  setTimeout(sizeCanvas, 80);
-  window.addEventListener('resize', sizeCanvas, { passive: true });
-  screen.orientation?.addEventListener('change', () => setTimeout(sizeCanvas, 300));
+// ── Display setup ─────────────────────────────────────────────
+function setupDisplay(w,h) {
+  vidW=w; vidH=h;
+  const isP=h>w;
+  const vs=G('vs');
+  if (window.innerWidth<768) {
+    vs.style.height = isP?`${Math.min(w*(16/9),window.innerHeight*0.64)}px`:`${Math.min(w*0.5625,window.innerHeight*0.5)}px`;
+    vs.style.maxHeight = isP?'64dvh':'50dvh';
+  } else { vs.style.height=''; vs.style.maxHeight=''; }
+  G('sp').style.display='none';
+  G('oc').style.display='block'; G('tapDiv').style.display='block';
+  G('flipBtn').style.display='flex';
+  setTimeout(sizeCanvas,80);
+  window.addEventListener('resize',sizeCanvas,{passive:true});
 }
 
 function sizeCanvas() {
-  const vs = G('vs');
-  const w = vs.clientWidth, h = vs.clientHeight;
-  if (!w || !h) return;
-  const oc = G('oc');
-  if (oc.width !== w || oc.height !== h) { oc.width = w; oc.height = h; }
+  const vs=G('vs'); const oc=G('oc');
+  const w=vs.clientWidth, h=vs.clientHeight;
+  if (!w||!h) return;
+  if (oc.width!==w||oc.height!==h){oc.width=w;oc.height=h;}
 }
 
-// Returns the rect (in section pixels) where the video content appears
-// under object-fit:contain letterboxing
 function getBox() {
-  const vs = G('vs');
-  const sw = vs.clientWidth, sh = vs.clientHeight;
-  if (!sw || !sh || !vidW || !vidH) return null;
-  const va = vidW / vidH, ca = sw / sh;
-  let dw, dh, dx, dy;
-  if (va > ca) { dw = sw; dh = sw / va; dx = 0;        dy = (sh - dh) / 2; }
-  else         { dh = sh; dw = sh * va; dy = 0;        dx = (sw - dw) / 2; }
-  return { dw, dh, dx, dy, sx: dw / vidW, sy: dh / vidH };
+  const vs=G('vs'); const sw=vs.clientWidth,sh=vs.clientHeight;
+  if (!sw||!sh||!vidW||!vidH) return null;
+  const va=vidW/vidH, ca=sw/sh;
+  let dw,dh,dx,dy;
+  if (va>ca){dw=sw;dh=sw/va;dx=0;dy=(sh-dh)/2;}
+  else{dh=sh;dw=sh*va;dy=0;dx=(sw-dw)/2;}
+  return {dw,dh,dx,dy,sx:dw/vidW,sy:dh/vidH};
 }
+const toD = (x,y,b)=>({x:b.dx+x*b.sx,y:b.dy+y*b.sy});
+const toV = (x,y,b)=>({x:(x-b.dx)/b.sx,y:(y-b.dy)/b.sy});
 
-const toDisplay = (x, y, b) => ({ x: b.dx + x * b.sx, y: b.dy + y * b.sy });
-const toVideo   = (x, y, b) => ({ x: (x - b.dx) / b.sx, y: (y - b.dy) / b.sy });
-
-// ── Main loop ────────────────────────────────────────────────────
+// ── Main loop ─────────────────────────────────────────────────
 async function mainLoop() {
-  if (!running && !rewatching) return;
-  const vid = G('videoEl');
-  if (!vid.paused && !vid.ended && !busy) {
-    busy = true;
+  if (!running&&!rewatching) return;
+  const vid=G('videoEl');
+  if (!vid.paused&&!vid.ended&&!busy) {
+    busy=true;
     try {
-      const raw = await det.estimatePoses(vid, { maxPoses: 4, flipHorizontal: false });
-      raw.forEach((p, i) => p._i = i);  // stable index-based ID
+      const raw=await det.estimatePoses(vid,{maxPoses:4,flipHorizontal:false});
+      raw.forEach((p,i)=>p._i=i);
       handlePoses(raw);
-    } catch(e) {/* skip frame */}
-    finally { busy = false; }
+    } catch(e){}
+    finally{busy=false;}
   }
-  if (rewatching && G('videoEl').duration) updateScrubUI();
-  rafId = requestAnimationFrame(mainLoop);
+  if (rewatching&&G('videoEl').duration) updateScrubUI();
+  rafId=requestAnimationFrame(mainLoop);
 }
 
-// ── Pose handling ─────────────────────────────────────────────────
+// ── Pose handling ──────────────────────────────────────────────
 function handlePoses(raw) {
-  lastPoses = raw;
-  const n = raw.length;
-  multiVisible = n > 1;
-  const box = getBox();
-  const oc = G('oc');
-  const ctx = oc.getContext('2d');
-  ctx.clearRect(0, 0, oc.width, oc.height);  // transparent — video shows through
-
-  // Person count badge
-  if (n > 1) { sEl('pcBadge', `👤 ${n} players`); G('pcBadge').style.display = 'block'; }
-  else G('pcBadge').style.display = 'none';
-
-  // Auto-select single person; prompt if multiple
-  if (n === 1) { selIdx = 0; G('selHint').style.display = 'none'; }
-  else if (n > 1 && selIdx === null) G('selHint').style.display = 'block';
-  else G('selHint').style.display = 'none';
-
-  if (box) {
-    raw.forEach(p => {
-      const isSel = (n === 1) || (p._i === selIdx);
-      drawPerson(ctx, p.keypoints, box, isSel);
-      if (n > 1) drawBox(ctx, p.keypoints, box, isSel);
+  lastPoses=raw; const n=raw.length; multiVisible=n>1;
+  const box=getBox(); const oc=G('oc'); const ctx=oc.getContext('2d');
+  ctx.clearRect(0,0,oc.width,oc.height);
+  // Player count badge
+  if (n>1){
+    G('pcBadge').innerHTML=`<span class="material-symbols-outlined" style="font-size:14px">person</span> ${n} players`;
+    G('pcBadge').style.display='flex';
+  } else G('pcBadge').style.display='none';
+  if (n===1){selIdx=0;G('selHint').style.display='none';}
+  else if (n>1&&selIdx===null) G('selHint').style.display='flex';
+  else G('selHint').style.display='none';
+  if (box){
+    raw.forEach(p=>{
+      const isSel=(n===1)||(p._i===selIdx);
+      drawPerson(ctx,p.keypoints,box,isSel);
+      if(n>1)drawBox(ctx,p.keypoints,box,isSel);
     });
   }
-
-  // Swing analysis — only for selected person
-  if (!rewatching && box) {
-    const sel = (n === 1) ? raw[0] : raw.find(p => p._i === selIdx);
-    if (sel) {
-      const pts = sel.keypoints.map(k => ({
-        x: k.x, y: k.y,
-        nx: k.x / vidW, ny: k.y / vidH,
-        score: k.score || 0
-      }));
+  if (!rewatching&&box){
+    const sel=(n===1)?raw[0]:raw.find(p=>p._i===selIdx);
+    if (sel){
+      const pts=sel.keypoints.map(k=>({x:k.x,y:k.y,nx:k.x/vidW,ny:k.y/vidH,score:k.score||0}));
       analyzeSwing(pts);
-      if (swState === 1) drawTrail(ctx, pts, box);
-      poseHist.push(pts);
-      if (poseHist.length > 90) poseHist.shift();
+      if(swState===1)drawTrail(ctx,pts,box);
+      poseHist.push(pts); if(poseHist.length>90)poseHist.shift();
     }
   }
-
-  if (rewatching) checkReplayFlash(G('videoEl').currentTime);
+  if(rewatching) checkReplayFlash(G('videoEl').currentTime);
 }
 
-// ── Person selection tap ─────────────────────────────────────────
-// tapDiv is the transparent clickable layer over the video section
-G('tapDiv').addEventListener('click', onTap);
-G('tapDiv').addEventListener('touchend', e => {
-  if (scrubbing) return;
-  e.preventDefault();
-  const t = e.changedTouches[0];
-  onTap({ clientX: t.clientX, clientY: t.clientY });
-}, { passive: false });
+// ── Tap for person selection ───────────────────────────────────
+G('tapDiv').addEventListener('click',onTap);
+G('tapDiv').addEventListener('touchend',e=>{
+  if(scrubbing)return; e.preventDefault();
+  const t=e.changedTouches[0]; onTap({clientX:t.clientX,clientY:t.clientY});
+},{passive:false});
 
 function onTap(e) {
-  if (!lastPoses.length || lastPoses.length === 1) {
-    if (lastPoses.length === 1) selIdx = 0;
-    return;
-  }
-  const tapDiv = G('tapDiv');
-  const rect = tapDiv.getBoundingClientRect();
-  if (!rect.width || !rect.height) return;
-
-  // tapDiv covers the whole #vs; convert to section coords
-  const cx = e.clientX - rect.left;
-  const cy = e.clientY - rect.top;
-
-  // Convert section coords → video native coords
-  const box = getBox();
-  if (!box) return;
-  const { x: vx, y: vy } = toVideo(cx, cy, box);
-
-  // Find nearest person (by keypoint centroid in video coords)
-  let best = null, bestDist = Infinity;
-  lastPoses.forEach(p => {
-    const kps = p.keypoints.filter(k => (k.score || 0) > 0.25);
-    if (!kps.length) return;
-    const mx = kps.reduce((s, k) => s + k.x, 0) / kps.length;
-    const my = kps.reduce((s, k) => s + k.y, 0) / kps.length;
-    const d = Math.hypot(vx - mx, vy - my);
-    if (d < bestDist) { bestDist = d; best = p; }
+  if(!lastPoses.length||lastPoses.length===1){if(lastPoses.length===1)selIdx=0;return;}
+  const td=G('tapDiv'); const rect=td.getBoundingClientRect();
+  if(!rect.width||!rect.height)return;
+  const cx=e.clientX-rect.left, cy=e.clientY-rect.top;
+  const box=getBox(); if(!box)return;
+  const{x:vx,y:vy}=toV(cx,cy,box);
+  let best=null,bestD=Infinity;
+  lastPoses.forEach(p=>{
+    const kps=p.keypoints.filter(k=>(k.score||0)>.25);
+    if(!kps.length)return;
+    const mx=kps.reduce((s,k)=>s+k.x,0)/kps.length;
+    const my=kps.reduce((s,k)=>s+k.y,0)/kps.length;
+    const d=Math.hypot(vx-mx,vy-my);
+    if(d<bestD){bestD=d;best=p;}
   });
-
-  if (best && bestDist < vidW * 0.45) {
-    selIdx = best._i;
-    G('selHint').style.display = 'none';
-    // Flash selection ring
-    const kps = best.keypoints.filter(k => (k.score || 0) > 0.25);
-    if (kps.length && box) {
-      const mx = kps.reduce((s, k) => s + k.x, 0) / kps.length;
-      const my = kps.reduce((s, k) => s + k.y, 0) / kps.length;
-      const dp = toDisplay(mx, my, box);
-      const ctx = G('oc').getContext('2d');
-      ctx.strokeStyle = 'rgba(0,255,136,1)';
-      ctx.lineWidth = 3;
-      ctx.beginPath(); ctx.arc(dp.x, dp.y, 50, 0, Math.PI * 2); ctx.stroke();
+  if(best&&bestD<vidW*.45){
+    selIdx=best._i; G('selHint').style.display='none';
+    const kps=best.keypoints.filter(k=>(k.score||0)>.25);
+    if(kps.length&&box){
+      const mx=kps.reduce((s,k)=>s+k.x,0)/kps.length;
+      const my=kps.reduce((s,k)=>s+k.y,0)/kps.length;
+      const dp=toD(mx,my,box);
+      const ctx=G('oc').getContext('2d');
+      ctx.strokeStyle='rgba(96,255,153,1)';ctx.lineWidth=3;
+      ctx.beginPath();ctx.arc(dp.x,dp.y,50,0,Math.PI*2);ctx.stroke();
     }
   }
 }
 
-// ── Drawing ───────────────────────────────────────────────────────
-const SKEL = [
-  [KP.ls,KP.rs],[KP.ls,KP.le],[KP.le,KP.lw],[KP.rs,KP.re],[KP.re,KP.rw],
-  [KP.ls,KP.lh],[KP.rs,KP.rh],[KP.lh,KP.rh],
-  [KP.lh,KP.lk],[KP.lk,KP.la],[KP.rh,KP.rk],[KP.rk,KP.ra],
-  [KP.ns,KP.ls],[KP.ns,KP.rs]
-];
+// ── Drawing ───────────────────────────────────────────────────
+const SKEL=[[KP.ls,KP.rs],[KP.ls,KP.le],[KP.le,KP.lw],[KP.rs,KP.re],[KP.re,KP.rw],
+  [KP.ls,KP.lh],[KP.rs,KP.rh],[KP.lh,KP.rh],[KP.lh,KP.lk],[KP.lk,KP.la],
+  [KP.rh,KP.rk],[KP.rk,KP.ra],[KP.ns,KP.ls],[KP.ns,KP.rs]];
 
-function drawPerson(ctx, kps, b, isSel) {
-  const wI = hand === 'right' ? KP.rw : KP.lw;
-  const eI = hand === 'right' ? KP.re : KP.le;
-  const sI = hand === 'right' ? KP.rs : KP.ls;
-  const arm = new Set([wI, eI, sI]);
-  const α = isSel ? 1.0 : 0.25;
-  ctx.globalAlpha = α;
-  SKEL.forEach(([a, ci]) => {
-    const pa = kps[a], pb = kps[ci];
-    if (!pa || !pb || (pa.score||0) < 0.25 || (pb.score||0) < 0.25) return;
-    const A = toDisplay(pa.x, pa.y, b), B = toDisplay(pb.x, pb.y, b);
-    const isA = arm.has(a) || arm.has(ci);
-    ctx.strokeStyle = isA && isSel ? 'rgba(0,255,136,1)' : 'rgba(255,255,255,0.55)';
-    ctx.lineWidth = isA && isSel ? 3 : 2;
-    ctx.beginPath(); ctx.moveTo(A.x, A.y); ctx.lineTo(B.x, B.y); ctx.stroke();
+function drawPerson(ctx,kps,b,isSel){
+  const wI=hand==='right'?KP.rw:KP.lw,eI=hand==='right'?KP.re:KP.le,sI=hand==='right'?KP.rs:KP.ls;
+  const arm=new Set([wI,eI,sI]); ctx.globalAlpha=isSel?1:.25;
+  SKEL.forEach(([a,ci])=>{
+    const pa=kps[a],pb=kps[ci];
+    if(!pa||!pb||(pa.score||0)<.25||(pb.score||0)<.25)return;
+    const A=toD(pa.x,pa.y,b),B=toD(pb.x,pb.y,b);
+    const isA=arm.has(a)||arm.has(ci);
+    ctx.strokeStyle=isA&&isSel?'rgba(96,255,153,1)':'rgba(255,255,255,.55)';
+    ctx.lineWidth=isA&&isSel?3:2;
+    ctx.beginPath();ctx.moveTo(A.x,A.y);ctx.lineTo(B.x,B.y);ctx.stroke();
   });
-  kps.forEach((k, i) => {
-    if (!k || (k.score||0) < 0.25) return;
-    const p = toDisplay(k.x, k.y, b);
-    const isW = i === wI, isA = arm.has(i);
-    ctx.beginPath(); ctx.arc(p.x, p.y, isW ? 9 : isA ? 5 : 4, 0, Math.PI * 2);
-    ctx.fillStyle = isW && isSel ? '#00ff88' : isA && isSel ? 'rgba(0,255,136,.8)' : 'rgba(255,255,255,.5)';
-    ctx.fill();
+  kps.forEach((k,i)=>{
+    if(!k||(k.score||0)<.25)return;
+    const p=toD(k.x,k.y,b);
+    const isW=i===wI,isA=arm.has(i);
+    ctx.beginPath();ctx.arc(p.x,p.y,isW?9:isA?5:4,0,Math.PI*2);
+    ctx.fillStyle=isW&&isSel?'#60ff99':isA&&isSel?'rgba(96,255,153,.8)':'rgba(255,255,255,.5)';
+    if(isW&&isSel){ctx.shadowColor='rgba(96,255,153,.6)';ctx.shadowBlur=8;}
+    ctx.fill(); ctx.shadowBlur=0;
   });
-  ctx.globalAlpha = 1;
+  ctx.globalAlpha=1;
 }
-
-function drawBox(ctx, kps, b, isSel) {
-  const ok = kps.filter(k => (k.score||0) > 0.25);
-  if (!ok.length) return;
-  const xs = ok.map(k => k.x), ys = ok.map(k => k.y);
-  const A = toDisplay(Math.min(...xs) - 15, Math.min(...ys) - 15, b);
-  const B = toDisplay(Math.max(...xs) + 15, Math.max(...ys) + 15, b);
-  ctx.globalAlpha = isSel ? 0.9 : 0.35;
-  ctx.strokeStyle = isSel ? '#00ff88' : 'rgba(255,255,255,.6)';
-  ctx.lineWidth = 2; ctx.setLineDash([6, 3]);
-  ctx.strokeRect(A.x, A.y, B.x - A.x, B.y - A.y);
+function drawBox(ctx,kps,b,isSel){
+  const ok=kps.filter(k=>(k.score||0)>.25); if(!ok.length)return;
+  const xs=ok.map(k=>k.x),ys=ok.map(k=>k.y);
+  const A=toD(Math.min(...xs)-15,Math.min(...ys)-15,b);
+  const B=toD(Math.max(...xs)+15,Math.max(...ys)+15,b);
+  ctx.globalAlpha=isSel?.9:.35;
+  ctx.strokeStyle=isSel?'#60ff99':'rgba(255,255,255,.6)';
+  ctx.lineWidth=2;ctx.setLineDash([6,3]);
+  ctx.strokeRect(A.x,A.y,B.x-A.x,B.y-A.y);
   ctx.setLineDash([]);
-  const fs = Math.max(11, b.dh * 0.022);
-  ctx.font = `bold ${fs}px system-ui`;
-  ctx.fillStyle = isSel ? 'rgba(0,255,136,.9)' : 'rgba(255,255,255,.5)';
-  ctx.fillText(isSel ? '● Tracking' : 'tap to track', A.x + 4, A.y - 4);
-  ctx.globalAlpha = 1;
+  ctx.font=`bold ${Math.max(11,b.dh*.022)}px Geist,system-ui`;
+  ctx.fillStyle=isSel?'rgba(96,255,153,.9)':'rgba(255,255,255,.5)';
+  ctx.fillText(isSel?'● Tracking':'tap to track',A.x+4,A.y-4);
+  ctx.globalAlpha=1;
 }
-
-function drawTrail(ctx, pts, b) {
-  const wI = hand === 'right' ? KP.rw : KP.lw;
-  const trail = poseHist.slice(-12).map(p => p[wI]).filter(p => p && p.score > 0.25);
-  if (trail.length < 2) return;
-  ctx.strokeStyle = 'rgba(0,255,136,.45)'; ctx.lineWidth = 2; ctx.setLineDash([4, 4]);
+function drawTrail(ctx,pts,b){
+  const wI=hand==='right'?KP.rw:KP.lw;
+  const trail=poseHist.slice(-12).map(p=>p[wI]).filter(p=>p&&p.score>.25);
+  if(trail.length<2)return;
+  ctx.strokeStyle='rgba(96,255,153,.45)';ctx.lineWidth=2;ctx.setLineDash([4,4]);
   ctx.beginPath();
-  const s = toDisplay(trail[0].x, trail[0].y, b); ctx.moveTo(s.x, s.y);
-  trail.forEach(p => { const d = toDisplay(p.x, p.y, b); ctx.lineTo(d.x, d.y); });
-  ctx.stroke(); ctx.setLineDash([]);
+  const s=toD(trail[0].x,trail[0].y,b);ctx.moveTo(s.x,s.y);
+  trail.forEach(p=>{const d=toD(p.x,p.y,b);ctx.lineTo(d.x,d.y);});
+  ctx.stroke();ctx.setLineDash([]);
 }
 
-// ── Velocity ──────────────────────────────────────────────────────
-function smoothVel() {
-  const n = Math.min(3, poseHist.length); if (n < 2) return null;
-  const wI = hand === 'right' ? KP.rw : KP.lw;
-  let sx = 0, sy = 0, c = 0;
-  for (let i = poseHist.length - n; i < poseHist.length - 1; i++) {
-    const a = poseHist[i][wI], b = poseHist[i+1][wI];
-    if (a && b && a.score > 0.3 && b.score > 0.3) { sx += b.nx - a.nx; sy += b.ny - a.ny; c++; }
+// ── Swing analysis ─────────────────────────────────────────────
+function smoothVel(){
+  const n=Math.min(3,poseHist.length);if(n<2)return null;
+  const wI=hand==='right'?KP.rw:KP.lw;
+  let sx=0,sy=0,c=0;
+  for(let i=poseHist.length-n;i<poseHist.length-1;i++){
+    const a=poseHist[i][wI],b=poseHist[i+1][wI];
+    if(a&&b&&a.score>.3&&b.score>.3){sx+=b.nx-a.nx;sy+=b.ny-a.ny;c++;}
   }
-  return c ? { dx: sx/c, dy: sy/c, mag: Math.hypot(sx/c, sy/c) } : null;
+  return c?{dx:sx/c,dy:sy/c,mag:Math.hypot(sx/c,sy/c)}:null;
 }
-
-// ── Swing state machine ───────────────────────────────────────────
-function analyzeSwing(pts) {
-  if (poseHist.length < 3) return;
-  const v = smoothVel(); if (!v) return;
-  if (cd > 0) { cd--; return; }
-  const wI = hand==='right'?KP.rw:KP.lw, eI = hand==='right'?KP.re:KP.le;
-  const sI = hand==='right'?KP.rs:KP.ls, hI = hand==='right'?KP.rh:KP.lh;
-  const w = pts[wI], e = pts[eI], s = pts[sI], h = pts[hI];
-  if (swState === 0) {
-    if (v.mag > T_START) {
-      swState = 1;
-      swData = { pm: v.mag, pdx: v.dx, pdy: v.dy,
-        cny: w?.ny ?? 0.5, hny: h?.ny ?? 0.6, sny: s?.ny ?? 0.3,
-        ea: e ? calcElbow(pts) : 120, fr: 1, vs: [v.mag] };
+function analyzeSwing(pts){
+  if(poseHist.length<3)return;
+  const v=smoothVel();if(!v)return;
+  if(cd>0){cd--;return;}
+  const wI=hand==='right'?KP.rw:KP.lw,eI=hand==='right'?KP.re:KP.le;
+  const sI=hand==='right'?KP.rs:KP.ls,hI=hand==='right'?KP.rh:KP.lh;
+  const w=pts[wI],e=pts[eI],s=pts[sI],h=pts[hI];
+  if(swState===0){
+    if(v.mag>T_START){
+      swState=1;swData={pm:v.mag,pdx:v.dx,pdy:v.dy,
+        cny:w?.ny??0.5,hny:h?.ny??0.6,sny:s?.ny??0.3,
+        ea:e?calcElbow(pts):120,fr:1,vs:[v.mag]};
     }
   } else {
-    if (v.mag > swData.pm) {
-      swData.pm = v.mag; swData.pdx = v.dx; swData.pdy = v.dy;
-      if (w) swData.cny = w.ny; if (h) swData.hny = h.ny;
-      if (s) swData.sny = s.ny; if (e) swData.ea = calcElbow(pts);
+    if(v.mag>swData.pm){
+      swData.pm=v.mag;swData.pdx=v.dx;swData.pdy=v.dy;
+      if(w)swData.cny=w.ny;if(h)swData.hny=h.ny;if(s)swData.sny=s.ny;if(e)swData.ea=calcElbow(pts);
     }
-    swData.fr++; swData.vs.push(v.mag);
-    if (v.mag < T_END && swData.pm >= T_PEAK) {
-      recordShot(swData); swState = 0; swData = null; cd = 25;
-    } else if (swData.fr > 90) { swState = 0; swData = null; }
+    swData.fr++;swData.vs.push(v.mag);
+    if(v.mag<T_END&&swData.pm>=T_PEAK){recordShot(swData);swState=0;swData=null;cd=25;}
+    else if(swData.fr>90){swState=0;swData=null;}
   }
 }
-
-function calcElbow(pts) {
-  const w = pts[hand==='right'?KP.rw:KP.lw];
-  const e = pts[hand==='right'?KP.re:KP.le];
-  const s = pts[hand==='right'?KP.rs:KP.ls];
-  if (!w || !e || !s) return 120;
-  const v1 = {x: w.x-e.x, y: w.y-e.y}, v2 = {x: s.x-e.x, y: s.y-e.y};
-  const d = v1.x*v2.x + v1.y*v2.y;
-  const m = Math.hypot(v1.x, v1.y) * Math.hypot(v2.x, v2.y);
-  return m ? Math.acos(Math.max(-1, Math.min(1, d/m))) * 180 / Math.PI : 120;
+function calcElbow(pts){
+  const w=pts[hand==='right'?KP.rw:KP.lw],e=pts[hand==='right'?KP.re:KP.le],s=pts[hand==='right'?KP.rs:KP.ls];
+  if(!w||!e||!s)return 120;
+  const v1={x:w.x-e.x,y:w.y-e.y},v2={x:s.x-e.x,y:s.y-e.y};
+  const d=v1.x*v2.x+v1.y*v2.y,m=Math.hypot(v1.x,v1.y)*Math.hypot(v2.x,v2.y);
+  return m?Math.acos(Math.max(-1,Math.min(1,d/m)))*180/Math.PI:120;
 }
 
-// ── Classification ─────────────────────────────────────────────────
-function classify(d) {
-  const bH = Math.max(0.01, d.hny - d.sny);
-  const cH = (d.hny - d.cny) / bH;
-  const hD = Math.abs(d.pdx) / Math.max(0.001, d.pm);
-  const sp = d.pm, fr = d.fr;
-  if (cH > 0.85 && d.pdy > 0.004 && sp > T_PEAK * 1.8) return 'smash';
-  if (d.pdy < -0.006 && sp < T_PEAK * 2.5)             return 'lob';
-  if (sp > T_PEAK * 2.0 && fr < 12 && cH > 0.2 && cH < 1.0) return 'flick';
-  if (sp > T_PEAK * 1.4 && hD > 0.45)                  return 'drive';
-  if (sp < T_PEAK * 0.5 && fr < 10)                    return 'block';
-  if (sp < T_PEAK * 0.9 && cH < 0.2 && cH > -0.3)     return 'reset';
-  if (sp < T_PEAK * 0.85 && cH < 0.35)                 return 'dink';
-  if (sp < T_PEAK * 1.4 && cH > 0.4 && cH < 1.1 && d.pdy < 0.002) return 'drop';
-  if (sp >= T_PEAK * 0.85 && sp <= T_PEAK * 2.0 && cH > 0.25 && cH < 0.85) return 'volley';
-  return sp > T_PEAK * 1.4 ? 'drive' : cH > 0.85 ? 'smash' : 'dink';
+// ── Classification ─────────────────────────────────────────────
+function classify(d){
+  const bH=Math.max(.01,d.hny-d.sny),cH=(d.hny-d.cny)/bH;
+  const hD=Math.abs(d.pdx)/Math.max(.001,d.pm),sp=d.pm,fr=d.fr;
+  if(cH>.85&&d.pdy>.004&&sp>T_PEAK*1.8)return'smash';
+  if(d.pdy<-.006&&sp<T_PEAK*2.5)return'lob';
+  if(sp>T_PEAK*2&&fr<12&&cH>.2&&cH<1)return'flick';
+  if(sp>T_PEAK*1.4&&hD>.45)return'drive';
+  if(sp<T_PEAK*.5&&fr<10)return'block';
+  if(sp<T_PEAK*.9&&cH<.2&&cH>-.3)return'reset';
+  if(sp<T_PEAK*.85&&cH<.35)return'dink';
+  if(sp<T_PEAK*1.4&&cH>.4&&cH<1.1&&d.pdy<.002)return'drop';
+  if(sp>=T_PEAK*.85&&sp<=T_PEAK*2&&cH>.25&&cH<.85)return'volley';
+  return sp>T_PEAK*1.4?'drive':cH>.85?'smash':'dink';
+}
+function techTips(type,d){
+  const t=[],{ea,pm,fr}=d;
+  if(type==='dink')  {t.push(pm>T_PEAK*1.1?{g:0,m:'Too much pace — soften the swing'}:{g:1,m:'Nice soft touch on the dink'});t.push(ea>155?{g:0,m:'Keep elbow slightly bent for control'}:{g:1,m:'Good elbow position'});}
+  else if(type==='drive') {t.push(pm>T_PEAK*2.5?{g:1,m:'Excellent power!'}:{g:0,m:'Load hips earlier for more drive power'});t.push(ea<75?{g:0,m:'Extend arm more at contact'}:ea>165?{g:0,m:'Avoid locking elbow'}:{g:1,m:'Good arm extension'});}
+  else if(type==='smash') {t.push(pm>T_PEAK*2.2?{g:1,m:'Powerful smash!'}:{g:0,m:'Snap wrist more at contact'});t.push({g:1,m:'High contact point — great positioning'});}
+  else if(type==='volley'){t.push(ea<75?{g:1,m:'Compact punch volley'}:{g:0,m:'Shorten backswing — punch through'});t.push(fr<8?{g:1,m:'Quick reaction!'}:{g:0,m:'Split-step earlier'});}
+  else if(type==='reset') {t.push(pm<T_PEAK*.6?{g:1,m:'Excellent soft reset'}:{g:0,m:'Soften grip to absorb pace'});t.push({g:0,m:'Stay low, paddle out front'});}
+  else if(type==='drop')  {t.push(pm<T_PEAK*1.2?{g:1,m:'Controlled drop pace'}:{g:0,m:'Take more pace off the drop'});t.push({g:0,m:'Follow the drop in to the kitchen'});}
+  else if(type==='lob')   {t.push({g:0,m:'Lob must clear opponent by 2–3 ft'});t.push(pm<T_PEAK*1.5?{g:1,m:'Good disguise on lob'}:{g:0,m:'Disguise better — same setup as dink'});}
+  else if(type==='block') {t.push(fr<8?{g:1,m:'Quick reflexes!'}:{g:0,m:'React faster'});t.push({g:0,m:'Soft hands — let ball die on paddle'});}
+  else if(type==='flick') {t.push(pm>T_PEAK*2?{g:1,m:'Great wrist acceleration!'}:{g:0,m:'Accelerate wrist snap later in swing'});t.push({g:0,m:'Disguise: same setup as dink, explode last 6 in'});}
+  return t.slice(0,2);
+}
+function rateShot(tc){
+  const w=tc.filter(t=>!t.g).length,g=tc.filter(t=>t.g).length;
+  return w===0&&g>=2?5:w===0?4:w===1&&g>=1?3:w===1?2:1;
 }
 
-function techTips(type, d) {
-  const t = [], { ea, pm, fr } = d;
-  if (type==='dink')  { t.push(pm>T_PEAK*1.1?{g:0,m:'Too much pace — soften the swing'}:{g:1,m:'Nice soft touch on the dink'}); t.push(ea>155?{g:0,m:'Keep elbow slightly bent for control'}:{g:1,m:'Good elbow position'}); }
-  else if (type==='drive')  { t.push(pm>T_PEAK*2.5?{g:1,m:'Excellent power!'}:{g:0,m:'Load hips earlier for more drive power'}); t.push(ea<75?{g:0,m:'Extend arm more at contact'}:ea>165?{g:0,m:'Avoid locking elbow'}:{g:1,m:'Good arm extension'}); }
-  else if (type==='smash')  { t.push(pm>T_PEAK*2.2?{g:1,m:'Powerful smash!'}:{g:0,m:'Snap wrist more at contact'}); t.push({g:1,m:'High contact — great positioning'}); }
-  else if (type==='volley') { t.push(ea<75?{g:1,m:'Compact punch volley'}:{g:0,m:'Shorten backswing — punch through'}); t.push(fr<8?{g:1,m:'Quick reaction!'}:{g:0,m:'Split-step earlier'}); }
-  else if (type==='reset')  { t.push(pm<T_PEAK*.6?{g:1,m:'Excellent soft reset'}:{g:0,m:'Soften grip to absorb pace'}); t.push({g:0,m:'Stay low, paddle out front'}); }
-  else if (type==='drop')   { t.push(pm<T_PEAK*1.2?{g:1,m:'Controlled drop pace'}:{g:0,m:'Take more pace off — aim for net height'}); t.push({g:0,m:'Follow the drop in to the kitchen'}); }
-  else if (type==='lob')    { t.push({g:0,m:'Lob must clear opponent by 2–3 ft'}); t.push(pm<T_PEAK*1.5?{g:1,m:'Good disguise on lob'}:{g:0,m:'Disguise better — same setup as dink'}); }
-  else if (type==='block')  { t.push(fr<8?{g:1,m:'Quick reflexes!'}:{g:0,m:'React faster'}); t.push({g:0,m:'Soft hands — let ball die on paddle'}); }
-  else if (type==='flick')  { t.push(pm>T_PEAK*2?{g:1,m:'Great wrist acceleration!'}:{g:0,m:'Accelerate wrist snap later in swing'}); t.push({g:0,m:'Disguise: same setup as dink, explode last 6 in'}); }
-  return t.slice(0, 2);
-}
-
-function rateShot(tc) {
-  const w = tc.filter(t => !t.g).length, g = tc.filter(t => t.g).length;
-  return w===0&&g>=2?5 : w===0?4 : w===1&&g>=1?3 : w===1?2 : 1;
-}
-
-// ── Record shot ────────────────────────────────────────────────────
-function recordShot(d) {
-  if (rewatching) return;
-  const type = classify(d), tc = techTips(type, d), rating = rateShot(tc);
-  const drills = DRILLS[type] || [];
-  const vid = G('videoEl');
-  const ts = isFile && vid.duration ? vid.currentTime : (Date.now() - sess.t0) / 1000;
-  sess.shots.push({ type, rating, tc, drills, ts });
-  shotTimestamps.push({ t: ts, type, rating });
-  counts[type] = (counts[type] || 0) + 1;
-
-  sEl(`dn-${type}`, counts[type]); sEl(`mn-${type}`, counts[type]);
-  [`dc-${type}`, `mc-${type}`].forEach(id => {
-    const c = G(id); if (!c) return;
-    c.classList.add('active'); setTimeout(() => c.classList.remove('active'), 1400);
+// ── Record shot ────────────────────────────────────────────────
+function recordShot(d){
+  if(rewatching)return;
+  const type=classify(d),tc=techTips(type,d),rating=rateShot(tc);
+  const drills=DRILLS[type]||[];
+  const vid=G('videoEl');
+  const ts=isFile&&vid.duration?vid.currentTime:(Date.now()-sess.t0)/1000;
+  sess.shots.push({type,rating,tc,drills,ts});
+  shotTS.push({t:ts,type,rating});
+  counts[type]=(counts[type]||0)+1;
+  // Update counts
+  sEl(`dn-${type}`,counts[type]); sEl(`mn-${type}`,counts[type]);
+  // Pulse cards
+  [`dc-${type}`,`mc-${type}`].forEach(id=>{
+    const c=G(id);if(!c)return;
+    c.classList.add('sc-active');
+    setTimeout(()=>c.classList.remove('sc-active'),1400);
   });
-
-  addHistEntry({ type, rating });
-  showFeedback(tc);
-  showDrill(drills);
-  updateStats(type);
-  flashBadge(type);
-  flashRating(rating);
+  addHistory({type,rating});showFeedback(tc);showDrill(drills);
+  updateStats(type);flashBadge(type);flashRating(rating);
 }
 
-function flashBadge(type) {
-  const el = G('shotBadge');
-  el.textContent = type.toUpperCase();
-  el.style.borderColor = el.style.color = SHOT_COLORS[type];
-  el.style.display = 'block';
-  clearTimeout(el._t); el._t = setTimeout(() => el.style.display = 'none', 1500);
+function flashBadge(type){
+  const el=G('shotBadge');
+  el.textContent=type.toUpperCase();
+  el.style.borderColor=SHOT_COLORS[type];el.style.color=SHOT_COLORS[type];
+  el.style.display='block';
+  clearTimeout(el._t);el._t=setTimeout(()=>el.style.display='none',1500);
 }
-function flashRating(r) {
-  const el = G('ratingPop');
-  el.textContent = stars(r); el.style.display = 'block';
-  clearTimeout(el._t); el._t = setTimeout(() => el.style.display = 'none', 1800);
+function flashRating(r){
+  const el=G('ratingPop');
+  el.textContent=stars(r);el.style.display='block';
+  clearTimeout(el._t);el._t=setTimeout(()=>el.style.display='none',1800);
 }
-function addHistEntry(s) {
-  const h = `<div class="she">
-    <span class="she-d" style="background:${SHOT_COLORS[s.type]}"></span>
-    <span class="she-n">${cap(s.type)}</span>
-    <span class="she-s">${stars(s.rating)}</span></div>`;
-  ['dHist','mHist'].forEach(id => {
-    const e = G(id); if (!e) return;
-    e.insertAdjacentHTML('afterbegin', h);
-    while (e.children.length > 25) e.removeChild(e.lastChild);
-  });
+function addHistory(s){
+  const h=`<div class="flex items-center gap-3 p-3 bg-surface-container border border-outline-variant rounded-lg mb-1.5 animate-[sli_.2s_ease]" style="animation:sli .2s ease">
+    <span class="w-2 h-2 rounded-full flex-shrink-0" style="background:${SHOT_COLORS[s.type]}"></span>
+    <span class="font-semibold text-[14px] flex-1 text-on-surface">${cap(s.type)}</span>
+    <span class="text-secondary-container text-[12px] tracking-widest">${stars(s.rating)}</span>
+  </div>
+  <style>@keyframes sli{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:translateX(0)}}</style>`;
+  ['dHist','mHist'].forEach(id=>{const e=G(id);if(!e)return;e.insertAdjacentHTML('afterbegin',h);while(e.children.length>26)e.removeChild(e.lastChild);});
 }
-function showFeedback(tc) {
-  const h = tc.length
-    ? tc.map(t => `<div class="fbi"><div class="fbd ${t.g?'good':'warn'}"></div><div>${t.m}</div></div>`).join('')
-    : '<p class="tmut">Good form!</p>';
-  ['dFb','mFb'].forEach(id => { const e = G(id); if (e) e.innerHTML = h; });
+function showFeedback(tc){
+  const clz={1:'dot-good',0:'dot-warn'};
+  const h=tc.length?tc.map(t=>`
+    <div class="flex items-start gap-3 p-3 bg-surface-container border border-outline-variant rounded-lg">
+      <div class="w-2.5 h-2.5 rounded-full mt-1 shrink-0 ${clz[t.g||0]||'dot-warn'}"></div>
+      <p class="text-[13px] leading-relaxed text-on-surface-variant">${t.m}</p>
+    </div>`).join(''):
+    '<p class="text-[13px] text-on-surface-variant">Good form!</p>';
+  ['dFb','mFb'].forEach(id=>{const e=G(id);if(e)e.innerHTML=h;});
 }
-function showDrill(drills) {
-  const p = drills[Math.floor(Math.random() * drills.length)];
-  const h = p ? `<div class="exbox"><span>${p.i}</span><div>${p.d}</div></div>` : '';
-  ['dEx','mEx'].forEach(id => { const e = G(id); if (e) e.innerHTML = h || '<p class="tmut">Keep playing…</p>'; });
+function showDrill(drills){
+  const p=drills[Math.floor(Math.random()*drills.length)];
+  const h=p?`<div class="flex gap-3 items-start p-3 bg-surface-container border border-primary-fixed/20 rounded-lg">
+    <span class="text-[20px] shrink-0">${p.i}</span>
+    <p class="text-[13px] leading-relaxed text-on-surface-variant">${p.d}</p>
+  </div>`:'<p class="text-[13px] text-on-surface-variant">Keep playing…</p>';
+  ['dEx','mEx'].forEach(id=>{const e=G(id);if(e)e.innerHTML=h;});
 }
-function updateStats(last) {
-  const n = sess.shots.length;
-  const top = Object.entries(counts).filter(([,v]) => v > 0).sort((a,b) => b[1]-a[1])[0];
-  const tn = top ? cap(top[0]) : '—';
-  ['sTot','mTot'].forEach(id => sEl(id, n));
-  ['sTop','mTop'].forEach(id => sEl(id, tn));
-  if (last) sEl('sLast', cap(last));
+function updateStats(last){
+  const n=sess.shots.length;
+  const top=Object.entries(counts).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1])[0];
+  const tn=top?cap(top[0]):'—';
+  ['sTot','mTot'].forEach(id=>sEl(id,n));
+  ['sTop','mTop'].forEach(id=>sEl(id,tn));
+  if(last)sEl('sLast',cap(last));
 }
 
-// ── MediaRecorder ──────────────────────────────────────────────────
-function startMRec(str) {
-  if (typeof MediaRecorder === 'undefined') return;
-  recChunks = [];
-  const mime = ['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm','video/mp4']
-    .find(t => { try { return MediaRecorder.isTypeSupported(t); } catch { return false; } }) || '';
-  try {
-    mrec = new MediaRecorder(str, mime ? { mimeType: mime } : {});
-    mrec.ondataavailable = e => { if (e.data.size > 0) recChunks.push(e.data); };
-    mrec.onstop = () => {
-      rewatchURL = URL.createObjectURL(new Blob(recChunks, { type: mrec.mimeType || 'video/webm' }));
-      showRewatchBtn();
-    };
+// ── MediaRecorder ──────────────────────────────────────────────
+function startMRec(str){
+  if(typeof MediaRecorder==='undefined')return;
+  recChunks=[];
+  const mime=['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm','video/mp4']
+    .find(t=>{try{return MediaRecorder.isTypeSupported(t);}catch{return false;}})||'';
+  try{
+    mrec=new MediaRecorder(str,mime?{mimeType:mime}:{});
+    mrec.ondataavailable=e=>{if(e.data.size>0)recChunks.push(e.data);};
+    mrec.onstop=()=>{ rewatchURL=URL.createObjectURL(new Blob(recChunks,{type:mrec.mimeType||'video/webm'})); showRewatchBtn(); };
     mrec.start(1000);
-  } catch(e) { mrec = null; }
+  }catch(e){mrec=null;}
 }
-function showRewatchBtn() {
-  G('btnRewatch')?.classList.remove('hidden');
-  G('mFabRw')?.classList.remove('hidden');
+function showRewatchBtn(){
+  const rw=G('btnRewatch'),mfw=G('mFabRw');
+  if(rw){rw.style.display='flex';} if(mfw){mfw.style.display='flex';}
 }
 
-// ── Rewatch ─────────────────────────────────────────────────────────
-function startRewatch() {
-  if (!rewatchURL) return;
-  rewatching = true; lastFlash = -1;
-  const vid = G('videoEl');
-  if (!isFile) { vid.srcObject = null; vid.src = rewatchURL; }
-  vid.currentTime = 0;
-  G('rwBar').style.display = 'flex';
+// ── Rewatch ────────────────────────────────────────────────────
+function startRewatch(){
+  if(!rewatchURL)return;
+  rewatching=true;lastFlash=-1;
+  const vid=G('videoEl');
+  if(!isFile){vid.srcObject=null;vid.src=rewatchURL;}
+  vid.currentTime=0;
+  G('rwBar').style.display='flex';
   buildScrubMarkers();
-  vid.onended = () => sEl('rwPlayBtn', '▶');
-  vid.play().catch(() => {});
-  ['mFabCam','mFabUp','mFabStop','mFabRep','mFabRw'].forEach(id => G(id)?.classList.add('hidden'));
-  if (!rafId) mainLoop();
+  vid.onended=()=>G('rwPlayBtn').querySelector('span').textContent='play_arrow';
+  vid.play().catch(()=>{});
+  ['mFabCam','mFabUp','mFabStop','mFabRep','mFabRw'].forEach(id=>{ const e=G(id);if(e)e.style.display='none'; });
+  if(!rafId)mainLoop();
 }
-function closeRewatch() {
-  rewatching = false;
-  G('videoEl').pause();
-  G('rwBar').style.display = 'none';
-  G('shotBadge').style.display = 'none';
-  ['mFabCam','mFabUp'].forEach(id => G(id)?.classList.remove('hidden'));
-  if (sess.shots.length) { ['mFabRep','mFabRw'].forEach(id => G(id)?.classList.remove('hidden')); }
+function closeRewatch(){
+  rewatching=false; G('videoEl').pause(); G('rwBar').style.display='none'; G('shotBadge').style.display='none';
+  ['mFabCam','mFabUp'].forEach(id=>{const e=G(id);if(e)e.style.display='flex';});
+  if(sess.shots.length){['mFabRep','mFabRw'].forEach(id=>{const e=G(id);if(e)e.style.display='flex';});}
 }
-function rwToggle() {
-  const v = G('videoEl');
-  if (v.paused) { v.play().then(() => sEl('rwPlayBtn','⏸')).catch(()=>{}); }
-  else           { v.pause(); sEl('rwPlayBtn','▶'); }
+function rwToggle(){
+  const v=G('videoEl'),icon=G('rwPlayBtn').querySelector('span');
+  if(v.paused){v.play().then(()=>{icon.textContent='pause';icon.classList.add('icon-fill');}).catch(()=>{});}
+  else{v.pause();icon.textContent='play_arrow';icon.classList.add('icon-fill');}
 }
-function rwRestart() {
-  const v = G('videoEl'); v.currentTime = 0; lastFlash = -1;
-  v.play().then(() => sEl('rwPlayBtn','⏸')).catch(()=>{});
+function rwRestart(){const v=G('videoEl');v.currentTime=0;lastFlash=-1;v.play().then(()=>{G('rwPlayBtn').querySelector('span').textContent='pause';}).catch(()=>{});}
+
+function updateScrubUI(){
+  const v=G('videoEl');if(!v.duration||scrubbing)return;
+  const p=(v.currentTime/v.duration)*100;
+  G('scrubFill').style.width=p+'%';G('scrubThumb').style.left=p+'%';
+  sEl('rwTime',`${fmt(v.currentTime)} / ${fmt(v.duration)}`);
+}
+function buildScrubMarkers(){
+  const dur=G('videoEl').duration||0;if(!dur)return;
+  G('scrubMarks').innerHTML=shotTS.map(s=>`
+    <div class="absolute w-2.5 h-2.5 rounded-full border-2 border-black/60 cursor-pointer"
+      style="left:${(s.t/dur)*100}%;top:50%;transform:translate(-50%,-50%);background:${SHOT_COLORS[s.type]}"
+      title="${cap(s.type)} ${stars(s.rating)}"></div>`).join('');
+}
+function scrubStart(e){
+  if(!rewatching)return; scrubbing=true; doScrub(e);
+  const up=()=>{scrubbing=false;document.removeEventListener('mousemove',doScrub);document.removeEventListener('mouseup',up);document.removeEventListener('touchmove',doScrub);document.removeEventListener('touchend',up);};
+  document.addEventListener('mousemove',doScrub,{passive:true});document.addEventListener('mouseup',up);
+  document.addEventListener('touchmove',doScrub,{passive:true});document.addEventListener('touchend',up);
+}
+function doScrub(e){
+  if(!scrubbing)return;
+  const tr=G('scrubTrack'),rect=tr.getBoundingClientRect();
+  const x=e.touches?e.touches[0].clientX:e.clientX;
+  const p=Math.max(0,Math.min(1,(x-rect.left)/rect.width));
+  const v=G('videoEl');if(v.duration){v.currentTime=p*v.duration;}
+}
+function checkReplayFlash(t){
+  shotTS.forEach((s,i)=>{if(i>lastFlash&&t>=s.t&&t<s.t+.5){lastFlash=i;flashBadge(s.type);flashRating(s.rating);}});
+  if(t<.5)lastFlash=-1;
 }
 
-function updateScrubUI() {
-  const v = G('videoEl');
-  if (!v.duration || scrubbing) return;
-  const p = (v.currentTime / v.duration) * 100;
-  G('scrubFill').style.width = p + '%';
-  G('scrubThumb').style.left = p + '%';
-  sEl('rwTime', `${fmt(v.currentTime)} / ${fmt(v.duration)}`);
+// ── Tab switching ──────────────────────────────────────────────
+function switchTab(t){
+  document.querySelectorAll('[id^="tab-"]').forEach(b=>{b.classList.remove('tab-on');b.classList.add('tab-off');});
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.add('hidden'));
+  const btn=G('tab-'+t);if(btn){btn.classList.add('tab-on');btn.classList.remove('tab-off');}
+  const panel=G('tp-'+t);if(panel)panel.classList.remove('hidden');
+  activeTab=t;
 }
-function buildScrubMarkers() {
-  const dur = G('videoEl').duration || 0; if (!dur) return;
-  G('scrubMarks').innerHTML = shotTimestamps.map(s =>
-    `<div class="smark" style="left:${(s.t/dur)*100}%;background:${SHOT_COLORS[s.type]}"
-       title="${cap(s.type)} ${stars(s.rating)}"></div>`).join('');
-}
-function scrubStart(e) {
-  if (!rewatching) return;
-  scrubbing = true; doScrub(e);
-  const up = () => {
-    scrubbing = false;
-    document.removeEventListener('mousemove', doScrub);
-    document.removeEventListener('mouseup', up);
-    document.removeEventListener('touchmove', doScrub);
-    document.removeEventListener('touchend', up);
-  };
-  document.addEventListener('mousemove', doScrub, { passive: true });
-  document.addEventListener('mouseup', up);
-  document.addEventListener('touchmove', doScrub, { passive: true });
-  document.addEventListener('touchend', up);
-}
-function doScrub(e) {
-  if (!scrubbing) return;
-  const tr = G('scrubTrack'), rect = tr.getBoundingClientRect();
-  const x = e.touches ? e.touches[0].clientX : e.clientX;
-  const p = Math.max(0, Math.min(1, (x - rect.left) / rect.width));
-  const v = G('videoEl'); if (v.duration) { v.currentTime = p * v.duration; }
-}
-function checkReplayFlash(t) {
-  shotTimestamps.forEach((s, i) => {
-    if (i > lastFlash && t >= s.t && t < s.t + 0.5) { lastFlash = i; flashBadge(s.type); flashRating(s.rating); }
+
+// ── Session control ────────────────────────────────────────────
+function beginSess(){
+  running=true;rewatching=false;
+  isFile=!!(G('videoEl').src&&!G('videoEl').srcObject);
+  sess={shots:[],t0:Date.now()};shotTS=[];lastFlash=-1;
+  selIdx=null;lastPoses=[];poseHist=[];swState=0;swData=null;cd=0;
+  SHOTS.forEach(t=>{counts[t]=0;sEl(`dn-${t}`,'0');sEl(`mn-${t}`,'0');
+    [`dc-${t}`,`mc-${t}`].forEach(id=>G(id)?.classList.remove('sc-active'));
   });
-  if (t < 0.5) lastFlash = -1;
+  ['dHist','mHist'].forEach(id=>{const e=G(id);if(e)e.innerHTML='';});
+  ['dFb','mFb'].forEach(id=>{const e=G(id);if(e)e.innerHTML='<p class="text-[13px] text-on-surface-variant">Hit some shots…</p>';});
+  ['dEx','mEx'].forEach(id=>{const e=G(id);if(e)e.innerHTML='<p class="text-[13px] text-on-surface-variant">Drills appear after shots…</p>';});
+  sEl('sLast','—');sEl('sTot','0');sEl('sTop','—');sEl('mTot','0');sEl('mTop','—');
+  G('rwBar').style.display='none';G('selHint').style.display='none';
+  // Desktop buttons
+  G('btnStop')?.classList.remove('hidden');G('btnReport')?.classList.add('hidden');G('btnRewatch')?.classList.add('hidden');
+  // FABs
+  ['mFabCam','mFabUp'].forEach(id=>{const e=G(id);if(e)e.style.display='none';});
+  const s=G('mFabStop');if(s)s.style.display='flex';
+  ['mFabRep','mFabRw','mBtnReport'].forEach(id=>{const e=G(id);if(e){e.style.display='none';e.classList.add('hidden');}});
+  // Rec dot
+  const rd=G('recDot');if(rd)rd.style.display='block';
+  if(ticker)clearInterval(ticker);
+  ticker=setInterval(()=>{
+    if(!running)return;
+    const s=Math.floor((Date.now()-sess.t0)/1000);
+    const ts=fmt(s);sEl('sDur',ts);sEl('mDur',ts);
+  },1000);
 }
 
-// ── Tab switching ─────────────────────────────────────────────────
-function switchTab(t) {
-  document.querySelectorAll('.tb').forEach(b => b.classList.remove('on'));
-  document.querySelectorAll('.tp').forEach(p => p.classList.remove('on'));
-  G('tab-' + t)?.classList.add('on');
-  G('tp-' + t)?.classList.add('on');
-  activeTab = t;
-}
-
-// ── Session control ───────────────────────────────────────────────
-function beginSess() {
-  running = true; rewatching = false;
-  isFile = !!(G('videoEl').src && !G('videoEl').srcObject);
-  sess = { shots: [], t0: Date.now() };
-  shotTimestamps = []; lastFlash = -1;
-  selIdx = null; lastPoses = []; poseHist = []; swState = 0; swData = null; cd = 0;
-  SHOTS.forEach(t => {
-    counts[t] = 0; sEl(`dn-${t}`, '0'); sEl(`mn-${t}`, '0');
-    [`dc-${t}`,`mc-${t}`].forEach(id => G(id)?.classList.remove('active'));
-  });
-  ['dHist','mHist'].forEach(id => { const e=G(id); if(e) e.innerHTML=''; });
-  ['dFb','mFb'].forEach(id => { const e=G(id); if(e) e.innerHTML='<p class="tmut">Hit some shots…</p>'; });
-  ['dEx','mEx'].forEach(id => { const e=G(id); if(e) e.innerHTML='<p class="tmut">Drills appear after shots…</p>'; });
-  sEl('sLast','—'); sEl('sTot','0'); sEl('sTop','—'); sEl('mTot','0'); sEl('mTop','—');
-  G('rwBar').style.display = 'none'; G('selHint').style.display = 'none';
-  G('btnStop')?.classList.remove('hidden');
-  G('btnReport')?.classList.add('hidden'); G('btnRewatch')?.classList.add('hidden');
-  G('mFabCam')?.classList.add('hidden'); G('mFabUp')?.classList.add('hidden');
-  G('mFabStop')?.classList.remove('hidden');
-  G('mFabRep')?.classList.add('hidden'); G('mFabRw')?.classList.add('hidden');
-  G('mBtnReport')?.classList.add('hidden');
-  G('recDot').style.display = 'block';
-  if (ticker) clearInterval(ticker);
-  ticker = setInterval(() => {
-    if (!running) return;
-    const s = Math.floor((Date.now() - sess.t0) / 1000);
-    const ts = fmt(s); sEl('sDur', ts); sEl('mDur', ts);
-  }, 1000);
-}
-
-function stopSess(showRep = true) {
-  running = false;
-  if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
-  if (mrec && mrec.state !== 'inactive') mrec.stop();
-  if (mediaStream && !isFile) { mediaStream.getTracks().forEach(t => t.stop()); mediaStream = null; }
+function stopSess(showRep=true){
+  running=false;
+  if(rafId){cancelAnimationFrame(rafId);rafId=null;}
+  if(mrec&&mrec.state!=='inactive')mrec.stop();
+  if(mediaStream&&!isFile){mediaStream.getTracks().forEach(t=>t.stop());mediaStream=null;}
   G('videoEl').pause();
-  if (ticker) { clearInterval(ticker); ticker = null; }
+  if(ticker){clearInterval(ticker);ticker=null;}
   G('btnStop')?.classList.add('hidden');
-  G('mFabStop')?.classList.add('hidden');
-  G('mFabCam')?.classList.remove('hidden');
-  G('mFabUp')?.classList.remove('hidden');
-  G('recDot').style.display = 'none';
-  G('selHint').style.display = 'none'; G('pcBadge').style.display = 'none';
-  if (sess.shots.length && showRep) {
+  const ms=G('mFabStop');if(ms)ms.style.display='none';
+  ['mFabCam','mFabUp'].forEach(id=>{const e=G(id);if(e)e.style.display='flex';});
+  const rd=G('recDot');if(rd)rd.style.display='none';
+  G('selHint').style.display='none';G('pcBadge').style.display='none';
+  if(sess.shots.length&&showRep){
     G('btnReport')?.classList.remove('hidden');
-    G('mFabRep')?.classList.remove('hidden');
-    G('mBtnReport')?.classList.remove('hidden');
-    if (isFile) showRewatchBtn();
+    ['mFabRep','mBtnReport'].forEach(id=>{const e=G(id);if(e){e.style.display='flex';e.classList.remove('hidden');}});
+    if(isFile)showRewatchBtn();
   }
 }
 
-// ── Report ────────────────────────────────────────────────────────
-function openReport() {
-  const n = sess.shots.length; if (!n) return;
-  const dur = Math.floor((Date.now() - sess.t0) / 1000);
-  const avgR = (sess.shots.reduce((a,s) => a+s.rating, 0) / n).toFixed(1);
-  const five = sess.shots.filter(s => s.rating === 5).length;
-  const top = Object.entries(counts).filter(([,v]) => v>0).sort((a,b) => b[1]-a[1])[0];
-  G('rGrid').innerHTML = [
-    [n, 'Total Shots'], [avgR+'★', 'Avg Rating'], [five, '★★★★★'],
-    [cap(top?.[0]||'—'), 'Most Played'],
-    [Object.keys(counts).filter(k=>counts[k]>0).length, 'Types Used'],
-    [`${Math.floor(dur/60)}:${(dur%60).toString().padStart(2,'0')}`, 'Duration']
-  ].map(([v,l]) => `<div class="rc"><div class="rv">${v}</div><div class="rl">${l}</div></div>`).join('');
-  const maxC = Math.max(1, ...Object.values(counts));
-  G('rBars').innerHTML = Object.entries(counts).filter(([,c])=>c>0).sort((a,b)=>b[1]-a[1])
-    .map(([t,c]) => `<div class="rbar"><div class="rbl">${cap(t)}</div>
-      <div class="rbt"><div class="rbf" style="width:${(c/maxC)*100}%;background:${SHOT_COLORS[t]}"></div></div>
-      <div class="rbn">${c}</div></div>`).join('');
-  const allTc = sess.shots.flatMap(s => s.tc||[]);
-  const warns = [...new Set(allTc.filter(t=>!t.g).map(t=>t.m))].slice(0,3);
-  const goods = [...new Set(allTc.filter(t=>t.g).map(t=>t.m))].slice(0,2);
-  const tips = [
-    ...goods.map(m=>`<div class="rtip"><span>✅</span>${m}</div>`),
-    ...warns.map(m=>`<div class="rtip"><span>⚠️</span>${m}</div>`)
-  ];
-  const weak = sess.shots.filter(s=>s.rating<=2).reduce((a,s)=>{a[s.type]=(a[s.type]||0)+1;return a;},{});
-  Object.entries(weak).sort((a,b)=>b[1]-a[1]).slice(0,3).forEach(([t]) => {
-    const d = (DRILLS[t]||[])[0];
-    if (d) tips.push(`<div class="rtip"><span>${d.i}</span><strong>${cap(t)}:</strong> ${d.d}</div>`);
-  });
-  if (!tips.length) tips.push(`<div class="rtip"><span>🏓</span>Keep rallying to unlock tips!</div>`);
-  G('rTips').innerHTML = tips.join('');
-  G('reportModal').classList.add('open');
-}
-function closeReport() { G('reportModal').classList.remove('open'); }
+// ── Report ─────────────────────────────────────────────────────
+function openReport(){
+  const n=sess.shots.length;if(!n)return;
+  const dur=Math.floor((Date.now()-sess.t0)/1000);
+  const avgR=(sess.shots.reduce((a,s)=>a+s.rating,0)/n).toFixed(1);
+  const five=sess.shots.filter(s=>s.rating===5).length;
+  const top=Object.entries(counts).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1])[0];
+  G('rGrid').innerHTML=[
+    [n,'Total Shots','primary-fixed'],[avgR+'★','Avg Rating','primary-fixed'],
+    [five,'★★★★★','primary-fixed'],
+    [cap(top?.[0]||'—'),'Most Played','on-surface'],
+    [Object.keys(counts).filter(k=>counts[k]>0).length,'Types Used','primary-fixed'],
+    [`${Math.floor(dur/60)}:${(dur%60).toString().padStart(2,'0')}`, 'Duration','on-surface'],
+  ].map(([v,l,c])=>`
+    <div class="bg-surface-container-low border border-outline-variant rounded-xl p-3 flex flex-col gap-1">
+      <span class="text-[10px] font-semibold tracking-widest text-on-surface-variant uppercase leading-tight">${l}</span>
+      <span class="text-[28px] font-bold leading-tight text-${c} text-glow">${v}</span>
+    </div>`).join('');
 
-// Swipe-down to close report
-let swipeY = 0;
-G('rSheet').addEventListener('touchstart', e => { swipeY = e.touches[0].clientY; }, { passive: true });
-G('rSheet').addEventListener('touchend', e => {
-  if (e.changedTouches[0].clientY - swipeY > 80) closeReport();
-}, { passive: true });
-G('reportModal').addEventListener('click', e => { if (e.target === G('reportModal')) closeReport(); });
-G('handSel').addEventListener('change', e => { hand = e.target.value; });
+  const maxC=Math.max(1,...Object.values(counts));
+  G('rBars').innerHTML=Object.entries(counts).filter(([,c])=>c>0).sort((a,b)=>b[1]-a[1])
+    .map(([t,c])=>`
+      <div class="space-y-1">
+        <div class="flex justify-between text-[12px] text-on-surface-variant px-0.5">
+          <span class="font-semibold">${cap(t)}</span>
+          <span>${c}</span>
+        </div>
+        <div class="h-2 w-full bg-surface-variant rounded-full overflow-hidden">
+          <div class="h-full rounded-full transition-all" style="width:${(c/maxC)*100}%;background:${SHOT_COLORS[t]}"></div>
+        </div>
+      </div>`).join('');
+
+  const allTc=sess.shots.flatMap(s=>s.tc||[]);
+  const warns=[...new Set(allTc.filter(t=>!t.g).map(t=>t.m))].slice(0,3);
+  const goods=[...new Set(allTc.filter(t=>t.g).map(t=>t.m))].slice(0,2);
+  const tips=[
+    ...goods.map(m=>`<div class="flex gap-3 items-start p-3 bg-surface-container-high border border-outline-variant rounded-xl"><span class="text-[20px] shrink-0 mt-0.5">✅</span><p class="text-[13px] leading-relaxed text-on-surface-variant">${m}</p></div>`),
+    ...warns.map(m=>`<div class="flex gap-3 items-start p-3 bg-surface-container-high border border-outline-variant rounded-xl"><span class="text-[20px] shrink-0 mt-0.5">⚠️</span><p class="text-[13px] leading-relaxed text-on-surface-variant">${m}</p></div>`),
+  ];
+  const weak=sess.shots.filter(s=>s.rating<=2).reduce((a,s)=>{a[s.type]=(a[s.type]||0)+1;return a;},{});
+  Object.entries(weak).sort((a,b)=>b[1]-a[1]).slice(0,3).forEach(([t])=>{
+    const d=(DRILLS[t]||[])[0];
+    if(d)tips.push(`<div class="flex gap-3 items-start p-3 bg-surface-container-high border border-primary-fixed/20 rounded-xl"><span class="text-[20px] shrink-0 mt-0.5">${d.i}</span><div><strong class="text-[13px] font-semibold text-primary-fixed">${cap(t)}:</strong><p class="text-[13px] leading-relaxed text-on-surface-variant mt-0.5">${d.d}</p></div></div>`);
+  });
+  if(!tips.length)tips.push(`<div class="flex gap-3 items-start p-3 bg-surface-container-high border border-outline-variant rounded-xl"><span class="text-[20px]">🏓</span><p class="text-[13px] text-on-surface-variant">Keep rallying to unlock detailed tips!</p></div>`);
+  G('rTips').innerHTML=tips.join('');
+  G('reportModal').style.display='flex';
+}
+function closeReport(){ G('reportModal').style.display='none'; }
+
+// Swipe report sheet down to close
+let swy=0;
+G('rSheet').addEventListener('touchstart',e=>{swy=e.touches[0].clientY;},{passive:true});
+G('rSheet').addEventListener('touchmove',e=>{
+  const dy=e.touches[0].clientY-swy;
+  if(dy>0)G('rSheet').style.transform=`translateY(${dy}px)`;
+},{passive:true});
+G('rSheet').addEventListener('touchend',e=>{
+  const dy=e.changedTouches[0].clientY-swy;
+  G('rSheet').style.transform='';
+  if(dy>100)closeReport();
+},{passive:true});
+
+// Button micro-interactions
+document.querySelectorAll('button').forEach(b=>{
+  b.addEventListener('mousedown',()=>b.classList.add('scale-95'));
+  b.addEventListener('mouseup',()=>b.classList.remove('scale-95'));
+  b.addEventListener('mouseleave',()=>b.classList.remove('scale-95'));
+});
+
+G('handSel') && G('handSel').addEventListener('change',e=>hand=e.target.value);
 </script>
 </body>
 </html>
