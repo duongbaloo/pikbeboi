@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PikBeBoi — Pickleball Technique Analyzer</title>
+  <style>
+    :root {
+      --bg: #090c0d;
+      --surface: #111618;
+      --surface2: #192020;
+      --border: #233030;
+      --green: #00ff88;
+      --yellow: #ffcc00;
+      --red: #ff4455;
+      --blue: #00aaff;
+      --orange: #ff7744;
+      --text: #ddeee8;
+      --muted: #506860;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; overflow: hidden; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    /* ── Header ─────────────────────────────────────── */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 18px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+      gap: 12px;
+    }
+    .logo { font-size: 1.25rem; font-weight: 800; color: var(--green); letter-spacing: -0.5px; }
+    .logo span { color: var(--text); font-weight: 400; }
+    .header-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+    .btn {
+      padding: 7px 14px;
+      border-radius: 7px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 600;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .btn-primary   { background: var(--green); color: #000; }
+    .btn-primary:hover { background: #00e87a; }
+    .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+    .btn-secondary:hover { border-color: var(--green); }
+    .btn-stop      { background: var(--red); color: #fff; }
+    .btn-stop:hover { background: #e03040; }
+    .btn-report    { background: var(--blue); color: #fff; }
+    .btn-report:hover { background: #0099ee; }
+
+    select {
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 7px 10px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      outline: none;
+    }
+    select:focus { border-color: var(--green); }
+
+    /* ── Main layout ─────────────────────────────────── */
+    #main {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* Video area */
+    #videoSection {
+      flex: 1;
+      position: relative;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      min-width: 0;
+    }
+    #startPrompt {
+      text-align: center;
+      color: var(--muted);
+      z-index: 2;
+      pointer-events: none;
+    }
+    #startPrompt .big { font-size: 3rem; margin-bottom: 14px; }
+    #startPrompt p { font-size: 0.95rem; line-height: 1.6; }
+
+    #videoEl {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      opacity: 0;
+      pointer-events: none;
+    }
+    #overlayCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: none;
+    }
+
+    /* Shot badge */
+    #shotBadge {
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.75);
+      border: 2px solid var(--green);
+      border-radius: 999px;
+      padding: 5px 22px;
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--green);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      display: none;
+      z-index: 10;
+      backdrop-filter: blur(6px);
+      transition: opacity 0.3s;
+    }
+
+    /* Loading overlay */
+    #loadingOverlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.82);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+    }
+    .spinner {
+      width: 38px; height: 38px;
+      border: 3px solid var(--border);
+      border-top-color: var(--green);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 14px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #loadingText { font-size: 0.9rem; color: var(--muted); }
+
+    /* ── Sidebar ─────────────────────────────────────── */
+    #sidebar {
+      width: 288px;
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .s-section {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .s-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    /* Exercise box */
+    .ex-item {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      padding: 8px 9px;
+      background: rgba(0,255,136,0.05);
+      border: 1px solid rgba(0,255,136,0.15);
+      border-radius: 7px;
+      font-size: 0.78rem;
+      line-height: 1.4;
+      margin-bottom: 6px;
+    }
+    .ex-ico { font-size: 0.9rem; flex-shrink: 0; margin-top: 1px; }
+
+    /* Shot grid */
+    .shot-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 6px;
+    }
+    .shot-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 9px 10px;
+      transition: all 0.25s;
+    }
+    .shot-card.active {
+      border-color: var(--green);
+      background: rgba(0,255,136,0.07);
+    }
+    .shot-card .sc-count { font-size: 1.3rem; font-weight: 700; }
+    .shot-card .sc-name  { font-size: 0.65rem; color: var(--muted); margin-top: 1px; }
+
+    /* Feedback */
+    .fb-item {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      margin-bottom: 7px;
+      font-size: 0.8rem;
+      line-height: 1.4;
+    }
+    .fb-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      margin-top: 4px;
+      flex-shrink: 0;
+    }
+    .fb-dot.good { background: var(--green); }
+    .fb-dot.warn { background: var(--yellow); }
+    .fb-dot.bad  { background: var(--red); }
+
+    /* Shot history */
+    #histHeader {
+      padding: 10px 16px 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    #shotHistory {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 12px;
+    }
+    #shotHistory::-webkit-scrollbar { width: 3px; }
+    #shotHistory::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .sh-entry {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 7px 9px;
+      background: var(--surface2);
+      border-radius: 6px;
+      margin-bottom: 5px;
+      font-size: 0.79rem;
+      animation: slideIn 0.25s ease;
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(12px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    .sh-name   { font-weight: 600; }
+    .sh-speed  { color: var(--green); font-variant-numeric: tabular-nums; }
+    .sh-badge  {
+      font-size: 0.68rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .q-good { background: rgba(0,255,136,0.12); color: var(--green); }
+    .q-ok   { background: rgba(255,204,0,0.12); color: var(--yellow); }
+    .q-poor { background: rgba(255,68,85,0.12); color: var(--red); }
+
+    /* ── Stats bar ───────────────────────────────────── */
+    #statsBar {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 9px 20px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-shrink: 0;
+    }
+    .stat { display: flex; flex-direction: column; }
+    .stat-v { font-size: 1.05rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .stat-l { font-size: 0.6rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 1px; }
+    .divider { width: 1px; height: 28px; background: var(--border); }
+    .rec-dot {
+      width: 8px; height: 8px;
+      background: var(--red);
+      border-radius: 50%;
+      animation: blink 1.4s ease-in-out infinite;
+      display: none;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+    /* ── Report modal ────────────────────────────────── */
+    #reportModal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.88);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+    #reportModal.open { display: flex; }
+    .report-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      width: 520px;
+      max-width: 92vw;
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+    .report-box::-webkit-scrollbar { width: 4px; }
+    .report-box::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .report-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 22px;
+    }
+    .report-title { font-size: 1.2rem; font-weight: 700; }
+    .report-grid {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+    .rg-cell {
+      background: var(--surface2);
+      border-radius: 10px;
+      padding: 13px;
+      text-align: center;
+    }
+    .rg-val { font-size: 1.8rem; font-weight: 800; color: var(--green); }
+    .rg-lbl { font-size: 0.68rem; color: var(--muted); margin-top: 3px; }
+    .r-section-title {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .shot-bar-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .sbl { width: 72px; font-size: 0.8rem; font-weight: 600; }
+    .sbt { flex: 1; height: 9px; background: var(--surface2); border-radius: 5px; overflow: hidden; }
+    .sbf { height: 100%; border-radius: 5px; transition: width 0.8s ease; }
+    .sbn { width: 24px; text-align: right; font-size: 0.78rem; color: var(--muted); }
+    .tips-list { display: flex; flex-direction: column; gap: 8px; }
+    .tip {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 10px;
+      background: var(--surface2);
+      border-radius: 8px;
+      font-size: 0.8rem;
+      line-height: 1.4;
+    }
+    .tip-ico { font-size: 0.95rem; flex-shrink: 0; }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<!-- ── Header ─────────────────────────────── -->
+<header>
+  <div class="logo">PikBe<span>Boi</span> 🏓</div>
+  <div class="header-right">
+    <select id="handSelect">
+      <option value="right">Right-handed</option>
+      <option value="left">Left-handed</option>
+    </select>
+    <button class="btn btn-primary" onclick="startCamera()">📷 Live Camera</button>
+    <button class="btn btn-secondary" onclick="document.getElementById('fileInput').click()">📁 Upload Video</button>
+    <input type="file" id="fileInput" accept="video/*" style="display:none" onchange="loadVideoFile(event)">
+    <button class="btn btn-stop hidden" id="btnStop" onclick="stopSession()">⏹ Stop</button>
+    <button class="btn btn-report hidden" id="btnReport" onclick="openReport()">📊 Report</button>
+  </div>
+</header>
+
+<!-- ── Main ──────────────────────────────── -->
+<div id="main">
+
+  <!-- Video + canvas -->
+  <div id="videoSection">
+    <div id="startPrompt">
+      <div class="big">🏓</div>
+      <p>Start your camera or upload a match video<br>and let PikBeBoi analyze your technique</p>
+    </div>
+    <video id="videoEl" playsinline muted></video>
+    <canvas id="overlayCanvas"></canvas>
+    <div id="shotBadge"></div>
+    <div id="loadingOverlay">
+      <div class="spinner"></div>
+      <div id="loadingText">Loading AI model…</div>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div id="sidebar">
+
+    <!-- Shot counts -->
+    <div class="s-section">
+      <div class="s-label">Shot Breakdown</div>
+      <div class="shot-grid">
+        <div class="shot-card" id="card-dink">
+          <div class="sc-count" id="cnt-dink">0</div>
+          <div class="sc-name">Dink</div>
+        </div>
+        <div class="shot-card" id="card-volley">
+          <div class="sc-count" id="cnt-volley">0</div>
+          <div class="sc-name">Volley</div>
+        </div>
+        <div class="shot-card" id="card-smash">
+          <div class="sc-count" id="cnt-smash">0</div>
+          <div class="sc-name">Smash</div>
+        </div>
+        <div class="shot-card" id="card-reset">
+          <div class="sc-count" id="cnt-reset">0</div>
+          <div class="sc-name">Reset</div>
+        </div>
+        <div class="shot-card" id="card-drop">
+          <div class="sc-count" id="cnt-drop">0</div>
+          <div class="sc-name">Drop</div>
+        </div>
+        <div class="shot-card" id="card-drive">
+          <div class="sc-count" id="cnt-drive">0</div>
+          <div class="sc-name">Drive</div>
+        </div>
+        <div class="shot-card" id="card-lob">
+          <div class="sc-count" id="cnt-lob">0</div>
+          <div class="sc-name">Lob</div>
+        </div>
+        <div class="shot-card" id="card-block">
+          <div class="sc-count" id="cnt-block">0</div>
+          <div class="sc-name">Block</div>
+        </div>
+        <div class="shot-card" id="card-flick">
+          <div class="sc-count" id="cnt-flick">0</div>
+          <div class="sc-name">Flick</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feedback + Exercise -->
+    <div class="s-section">
+      <div class="s-label">Technique Feedback</div>
+      <div id="feedbackBox">
+        <div style="color:var(--muted);font-size:0.8rem">Hit some shots to get feedback…</div>
+      </div>
+    </div>
+    <div class="s-section">
+      <div class="s-label">Drill to Improve</div>
+      <div id="exerciseBox">
+        <div style="color:var(--muted);font-size:0.8rem">Drills will appear after shots are detected…</div>
+      </div>
+    </div>
+
+    <!-- History header -->
+    <div id="histHeader">
+      <div class="s-label" style="margin:0">Recent Shots</div>
+    </div>
+    <div id="shotHistory"></div>
+  </div>
+
+</div><!-- #main -->
+
+<!-- ── Stats bar ──────────────────────────── -->
+<div id="statsBar">
+  <div class="rec-dot" id="recDot"></div>
+  <div class="stat"><div class="stat-v" id="sTot">0</div><div class="stat-l">Total Shots</div></div>
+  <div class="divider"></div>
+  <div class="stat"><div class="stat-v" id="sDur">0:00</div><div class="stat-l">Duration</div></div>
+  <div class="divider"></div>
+  <div class="stat"><div class="stat-v" id="sTop">—</div><div class="stat-l">Most Common</div></div>
+  <div class="divider"></div>
+  <div class="stat"><div class="stat-v" id="sLast">—</div><div class="stat-l">Last Shot</div></div>
+</div>
+
+<!-- ── Report modal ───────────────────────── -->
+<div id="reportModal">
+  <div class="report-box">
+    <div class="report-head">
+      <div class="report-title">📊 Session Report</div>
+      <button class="btn btn-secondary" onclick="closeReport()">✕ Close</button>
+    </div>
+    <div class="report-grid" id="rGrid"></div>
+    <div class="r-section-title">Shot Distribution</div>
+    <div id="rBars" style="margin-bottom:20px"></div>
+    <div class="r-section-title">Technique Tips</div>
+    <div class="tips-list" id="rTips"></div>
+  </div>
+</div>
+
+<!-- ── TensorFlow.js + MoveNet ─────────────────────────── -->
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.17.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection@2.1.3/dist/pose-detection.min.js"></script>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  PB COACH — Pickleball Technique Analyzer
+//  MoveNet keypoints (17):
+//  0=nose  5=L-shoulder  6=R-shoulder  7=L-elbow  8=R-elbow
+//  9=L-wrist 10=R-wrist  11=L-hip  12=R-hip
+//  13=L-knee 14=R-knee   15=L-ankle 16=R-ankle
+// ═══════════════════════════════════════════════════════════════
+
+const KP = {
+  nose:0, lShoulder:5, rShoulder:6, lElbow:7, rElbow:8,
+  lWrist:9, rWrist:10, lHip:11, rHip:12, lKnee:13, rKnee:14,
+  lAnkle:15, rAnkle:16
+};
+
+// ── Exercises per shot type ───────────────────────────────────
+const EXERCISES = {
+  dink: [
+    { ico:'🎯', drill:'Kitchen cross-court dink rally — keep 50 in a row without popping up' },
+    { ico:'🦵', drill:'Dink in an athletic stance: bend knees, eyes level with the net' },
+  ],
+  volley: [
+    { ico:'👊', drill:'"Punch volley" wall drill — stand 3 ft from wall, punch 20 consecutive volleys' },
+    { ico:'🚶', drill:'Crash-the-net drill: approach, split-step, punch volley — repeat 10×' },
+  ],
+  smash: [
+    { ico:'🏋️', drill:'Shadow overhead: toss ball to yourself, practice meeting it at the highest point' },
+    { ico:'🎯', drill:'Overhead placement drill — aim alternately crosscourt and down-the-line' },
+  ],
+  reset: [
+    { ico:'🧘', drill:'Soft-hands drill: partner drives hard at you, absorb pace and land in kitchen' },
+    { ico:'📐', drill:'Continental grip practice — neutral grip helps deaden pace on resets' },
+  ],
+  drop: [
+    { ico:'🌊', drill:'3rd-shot drop drill: serve, partner returns, you drop to kitchen 20 reps' },
+    { ico:'📏', drill:'Height practice — drop over the net by 6 inches, landing just past the line' },
+  ],
+  drive: [
+    { ico:'💪', drill:'Drive-and-follow-in drill: drive flat, then sprint to transition zone' },
+    { ico:'🔄', drill:'Hip rotation shadow swings — load backfoot, unwind through contact' },
+  ],
+  lob: [
+    { ico:'🌤️', drill:'Lob depth drill: aim for back 3 feet of court, disguise as dink shape' },
+    { ico:'🏃', drill:'Lob-and-retreat drill: lob then immediately backpedal to baseline' },
+  ],
+  block: [
+    { ico:'🛡️', drill:'"Paddle out front" drill: hold paddle chest-high at net, let ball hit it softly' },
+    { ico:'🤝', drill:'Soft-hands reflex drill: stand at kitchen, partner bangs at you from mid-court' },
+  ],
+  flick: [
+    { ico:'⚡', drill:'Wrist snap isolation: rest elbow on hip, flick wrist-only 30 reps each side' },
+    { ico:'🎭', drill:'Flick disguise drill: same backswing as dink, explode only in last 6 inches' },
+  ],
+};
+
+// App state
+let detector = null;
+let isRunning = false;
+let activeHand = 'right';
+let mediaStream = null;
+let rafId = null;
+let processingFrame = false;
+let sessionStartTime = null;
+let timerInterval = null;
+
+// Pose history
+let poseHistory = [];
+const MAX_HISTORY = 90;
+
+// Swing state machine
+const SS = { IDLE:0, SWINGING:1, COOLDOWN:2 };
+let swingState = SS.IDLE;
+let swingData = null;
+let cooldown = 0;
+
+// Thresholds (in normalized coords 0-1 per frame; 30fps → 0.02 ≈ fast move)
+const T_START = 0.010;   // start detecting
+const T_PEAK  = 0.022;   // confirm swing
+const T_END   = 0.007;   // swing finished
+
+// Session
+let session = { shots:[], startTime:null };
+let counts = { dink:0, volley:0, smash:0, reset:0, drop:0, drive:0, lob:0, block:0, flick:0 };
+
+// ── Init ──────────────────────────────────────────────────────
+
+async function initDetector() {
+  if (detector) return detector;
+  showLoading('Loading AI pose model (first run ~5s)…');
+  await tf.ready();
+  detector = await poseDetection.createDetector(
+    poseDetection.SupportedModels.MoveNet,
+    { modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING,
+      enableSmoothing: true }
+  );
+  hideLoading();
+  return detector;
+}
+
+// ── Camera ────────────────────────────────────────────────────
+
+async function startCamera() {
+  stopSession(false);
+  activeHand = document.getElementById('handSelect').value;
+  await initDetector();
+
+  showLoading('Requesting camera access…');
+  try {
+    mediaStream = await navigator.mediaDevices.getUserMedia({
+      video: { width: { ideal:1280 }, height: { ideal:720 }, facingMode:'user' },
+      audio: false
+    });
+  } catch(e) {
+    hideLoading();
+    alert('Camera error: ' + e.message);
+    return;
+  }
+
+  const vid = document.getElementById('videoEl');
+  vid.srcObject = mediaStream;
+  vid.onloadedmetadata = () => {
+    vid.play();
+    initCanvas(vid.videoWidth, vid.videoHeight);
+    hideLoading();
+    beginSession();
+    runLoop();
+  };
+}
+
+// ── Video file ────────────────────────────────────────────────
+
+async function loadVideoFile(ev) {
+  const file = ev.target.files[0];
+  ev.target.value = '';
+  if (!file) return;
+  stopSession(false);
+  activeHand = document.getElementById('handSelect').value;
+  await initDetector();
+
+  const vid = document.getElementById('videoEl');
+  vid.srcObject = null;
+  vid.src = URL.createObjectURL(file);
+  vid.onloadedmetadata = () => {
+    initCanvas(vid.videoWidth, vid.videoHeight);
+    vid.play();
+    beginSession();
+    runLoop();
+  };
+}
+
+function initCanvas(w, h) {
+  const c = document.getElementById('overlayCanvas');
+  c.width = w; c.height = h;
+  c.style.display = 'block';
+  document.getElementById('startPrompt').style.display = 'none';
+}
+
+// ── Main loop ─────────────────────────────────────────────────
+
+async function runLoop() {
+  if (!isRunning) return;
+  const vid = document.getElementById('videoEl');
+  if (!vid.paused && !vid.ended && !processingFrame) {
+    processingFrame = true;
+    try {
+      const poses = await detector.estimatePoses(vid, { flipHorizontal: false });
+      if (poses.length > 0) processPose(poses[0].keypoints);
+    } catch(e) { /* skip frame */ }
+    finally { processingFrame = false; }
+  }
+  rafId = requestAnimationFrame(runLoop);
+}
+
+// ── Pose processing ───────────────────────────────────────────
+
+function processPose(kps) {
+  const vid = document.getElementById('videoEl');
+  const canvas = document.getElementById('overlayCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+
+  // Draw video frame
+  ctx.drawImage(vid, 0, 0, W, H);
+
+  // Build point map with pixel coords
+  const pts = kps.map(k => ({
+    x: k.x, y: k.y,
+    nx: k.x / W, ny: k.y / H,
+    score: k.score
+  }));
+
+  // Draw skeleton
+  drawSkeleton(ctx, pts, W, H);
+
+  // Swing analysis
+  analyzeSwing(pts);
+
+  // Draw wrist trail during swing
+  if (swingState === SS.SWINGING) drawTrail(ctx, pts);
+
+  // Store in history
+  poseHistory.push(pts);
+  if (poseHistory.length > MAX_HISTORY) poseHistory.shift();
+}
+
+// ── Drawing ───────────────────────────────────────────────────
+
+const SKELETON = [
+  [5,6],[5,7],[7,9],[6,8],[8,10],        // upper body
+  [5,11],[6,12],[11,12],                  // torso
+  [11,13],[13,15],[12,14],[14,16],        // legs
+  [0,5],[0,6]                             // head
+];
+
+function drawSkeleton(ctx, pts, W, H) {
+  const wIdx = activeHand==='right' ? KP.rWrist : KP.lWrist;
+  const eIdx = activeHand==='right' ? KP.rElbow : KP.lElbow;
+  const sIdx = activeHand==='right' ? KP.rShoulder : KP.lShoulder;
+  const activeArm = new Set([wIdx, eIdx, sIdx]);
+
+  SKELETON.forEach(([a,b]) => {
+    const pa = pts[a], pb = pts[b];
+    if (!pa||!pb||pa.score<0.25||pb.score<0.25) return;
+    const isActive = activeArm.has(a) || activeArm.has(b);
+    ctx.strokeStyle = isActive ? 'rgba(0,255,136,0.9)' : 'rgba(255,255,255,0.35)';
+    ctx.lineWidth = isActive ? 3 : 2;
+    ctx.beginPath();
+    ctx.moveTo(pa.x, pa.y);
+    ctx.lineTo(pb.x, pb.y);
+    ctx.stroke();
+  });
+
+  pts.forEach((p, i) => {
+    if (!p || p.score < 0.25) return;
+    const isWrist = i === wIdx;
+    const isActive = activeArm.has(i);
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, isWrist ? 9 : isActive ? 5 : 4, 0, Math.PI*2);
+    ctx.fillStyle = isWrist ? '#00ff88' : isActive ? 'rgba(0,255,136,0.75)' : 'rgba(255,255,255,0.5)';
+    ctx.fill();
+  });
+}
+
+function drawTrail(ctx, pts) {
+  const wIdx = activeHand==='right' ? KP.rWrist : KP.lWrist;
+  const trail = poseHistory.slice(-12).map(p => p[wIdx]).filter(p => p && p.score > 0.25);
+  if (trail.length < 2) return;
+  ctx.strokeStyle = 'rgba(0,255,136,0.45)';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([4,4]);
+  ctx.beginPath();
+  ctx.moveTo(trail[0].x, trail[0].y);
+  trail.forEach(p => ctx.lineTo(p.x, p.y));
+  ctx.stroke();
+  ctx.setLineDash([]);
+}
+
+// ── Swing analysis ────────────────────────────────────────────
+
+function getWristVel(curr, prev) {
+  const wIdx = activeHand==='right' ? KP.rWrist : KP.lWrist;
+  const c = curr[wIdx], p = prev[wIdx];
+  if (!c||!p||c.score<0.3||p.score<0.3) return null;
+  const dx = c.nx - p.nx;
+  const dy = c.ny - p.ny;
+  return { mag: Math.sqrt(dx*dx+dy*dy), dx, dy, x:c.x, y:c.y, nx:c.nx, ny:c.ny };
+}
+
+function smoothVel() {
+  // Average velocity over last 3 frames
+  const n = Math.min(3, poseHistory.length);
+  if (n < 2) return null;
+  const wIdx = activeHand==='right' ? KP.rWrist : KP.lWrist;
+  let sx=0, sy=0, cnt=0;
+  for (let i = poseHistory.length-n; i < poseHistory.length-1; i++) {
+    const a = poseHistory[i][wIdx], b = poseHistory[i+1][wIdx];
+    if (a&&b&&a.score>0.3&&b.score>0.3) { sx+=b.nx-a.nx; sy+=b.ny-a.ny; cnt++; }
+  }
+  if (!cnt) return null;
+  return { dx:sx/cnt, dy:sy/cnt, mag:Math.sqrt((sx/cnt)**2+(sy/cnt)**2) };
+}
+
+function analyzeSwing(currPts) {
+  if (poseHistory.length < 3) return null;
+
+  const v = smoothVel();
+  if (!v) return null;
+
+  const wIdx = activeHand==='right' ? KP.rWrist : KP.lWrist;
+  const eIdx = activeHand==='right' ? KP.rElbow : KP.lElbow;
+  const sIdx = activeHand==='right' ? KP.rShoulder : KP.lShoulder;
+  const hIdx = activeHand==='right' ? KP.rHip : KP.lHip;
+
+  const wrist    = currPts[wIdx];
+  const elbow    = currPts[eIdx];
+  const shoulder = currPts[sIdx];
+  const hip      = currPts[hIdx];
+
+  if (cooldown > 0) { cooldown--; return; }
+
+  switch (swingState) {
+    case SS.IDLE:
+      if (v.mag > T_START) {
+        swingState = SS.SWINGING;
+        swingData = {
+          peakMag: v.mag, peakDx: v.dx, peakDy: v.dy,
+          contactNy: wrist ? wrist.ny : 0.5,
+          hipNy: hip ? hip.ny : 0.6,
+          shoulderNy: shoulder ? shoulder.ny : 0.3,
+          elbowAngle: elbow ? calcElbow(currPts) : 120,
+          frames: 1, vels: [v.mag]
+        };
+      }
+      break;
+
+    case SS.SWINGING:
+      if (v.mag > swingData.peakMag) {
+        swingData.peakMag   = v.mag;
+        swingData.peakDx    = v.dx;
+        swingData.peakDy    = v.dy;
+        swingData.contactNy = wrist    ? wrist.ny    : swingData.contactNy;
+        swingData.hipNy     = hip      ? hip.ny      : swingData.hipNy;
+        swingData.shoulderNy= shoulder ? shoulder.ny : swingData.shoulderNy;
+        swingData.elbowAngle= elbow    ? calcElbow(currPts) : swingData.elbowAngle;
+      }
+      swingData.frames++;
+      swingData.vels.push(v.mag);
+
+      if (v.mag < T_END && swingData.peakMag >= T_PEAK) {
+        // Shot confirmed!
+        recordShot(swingData);
+        swingState = SS.IDLE;
+        swingData = null;
+        cooldown = 25;
+      } else if (swingData.frames > 90) {
+        // Too long, abandon
+        swingState = SS.IDLE;
+        swingData = null;
+      }
+      break;
+  }
+
+}
+
+function calcElbow(pts) {
+  const wIdx = activeHand==='right' ? KP.rWrist : KP.lWrist;
+  const eIdx = activeHand==='right' ? KP.rElbow : KP.lElbow;
+  const sIdx = activeHand==='right' ? KP.rShoulder : KP.lShoulder;
+  const w=pts[wIdx], e=pts[eIdx], s=pts[sIdx];
+  if (!w||!e||!s) return 120;
+  const v1={x:w.x-e.x, y:w.y-e.y}, v2={x:s.x-e.x, y:s.y-e.y};
+  const dot=v1.x*v2.x+v1.y*v2.y;
+  const mag=Math.sqrt(v1.x**2+v1.y**2)*Math.sqrt(v2.x**2+v2.y**2);
+  if (!mag) return 120;
+  return Math.acos(Math.max(-1,Math.min(1,dot/mag)))*180/Math.PI;
+}
+
+// ── Shot classification ───────────────────────────────────────
+// cH: contact height relative to body (0=hip, 1=shoulder, >1=above shoulder)
+// speed multiples relative to T_PEAK
+// peakDy > 0 = wrist moving DOWN (screen coords), < 0 = moving UP
+
+function classify(d) {
+  const bodyH = Math.max(0.01, d.hipNy - d.shoulderNy);
+  const cH    = (d.hipNy - d.contactNy) / bodyH;   // >1 above shoulder, <0 below hip
+  const hDom  = Math.abs(d.peakDx) / Math.max(0.001, d.peakMag);
+  const speed = d.peakMag;
+  const dur   = d.frames;
+
+  // Smash: high contact + downward + fast
+  if (cH > 0.85 && d.peakDy > 0.004 && speed > T_PEAK * 1.8) return 'smash';
+
+  // Lob: upward wrist motion (negative dy in screen coords)
+  if (d.peakDy < -0.006 && speed < T_PEAK * 2.5) return 'lob';
+
+  // Flick: fast + short duration + wrist snap (mid-high contact)
+  if (speed > T_PEAK * 2.0 && dur < 12 && cH > 0.2 && cH < 1.0) return 'flick';
+
+  // Drive: fast + horizontal
+  if (speed > T_PEAK * 1.4 && hDom > 0.45) return 'drive';
+
+  // Block: very short/slow — defensive compact stop
+  if (speed < T_PEAK * 0.5 && dur < 10) return 'block';
+
+  // Reset: slow-medium, low contact, controlled (defensive dink-like)
+  if (speed < T_PEAK * 0.9 && cH < 0.2 && cH > -0.3) return 'reset';
+
+  // Dink: slow + low contact
+  if (speed < T_PEAK * 0.85 && cH < 0.35) return 'dink';
+
+  // Drop: medium speed + upward arc OR soft high-to-low arc, mid contact
+  if (speed < T_PEAK * 1.4 && cH > 0.4 && cH < 1.1 && d.peakDy < 0.002) return 'drop';
+
+  // Volley: medium speed, mid-high contact, compact
+  if (speed >= T_PEAK * 0.85 && speed <= T_PEAK * 2.0 && cH > 0.25 && cH < 0.85) return 'volley';
+
+  // Fallbacks
+  if (speed > T_PEAK * 1.4) return 'drive';
+  if (cH > 0.85) return 'smash';
+  return 'dink';
+}
+
+function assessTech(type, d) {
+  const tips = [];
+  const { elbowAngle, peakMag, frames } = d;
+
+  if (type === 'dink') {
+    if (peakMag > T_PEAK * 1.1) tips.push({t:'warn', m:'Too much pace on dink — soften the swing'});
+    else tips.push({t:'good', m:'Nice soft touch on the dink'});
+    if (elbowAngle > 155) tips.push({t:'warn', m:'Keep elbow slightly bent for better control'});
+    else tips.push({t:'good', m:'Good elbow position on dink'});
+  } else if (type === 'drive') {
+    if (peakMag > T_PEAK * 2.5) tips.push({t:'good', m:'Excellent power on drive!'});
+    else tips.push({t:'warn', m:'Load hips earlier to generate more drive power'});
+    if (elbowAngle < 75) tips.push({t:'warn', m:'Extend arm more at contact point'});
+    else if (elbowAngle > 165) tips.push({t:'warn', m:'Avoid locking elbow — slight bend at contact'});
+    else tips.push({t:'good', m:'Good arm extension on drive'});
+  } else if (type === 'smash') {
+    if (peakMag > T_PEAK * 2.2) tips.push({t:'good', m:'Powerful smash!'});
+    else tips.push({t:'warn', m:'Snap wrist more at contact for extra smash power'});
+    tips.push({t:'good', m:'High contact point — great overhead positioning'});
+  } else if (type === 'volley') {
+    if (elbowAngle < 75) tips.push({t:'good', m:'Compact punch volley — nice form'});
+    else tips.push({t:'warn', m:'Shorten the backswing — punch through the volley'});
+    if (frames < 8) tips.push({t:'good', m:'Quick reaction on volley'});
+  } else if (type === 'reset') {
+    if (peakMag < T_PEAK * 0.6) tips.push({t:'good', m:'Excellent soft reset — absorbing pace well'});
+    else tips.push({t:'warn', m:'Soften the grip to better absorb pace on reset'});
+    tips.push({t:'warn', m:'Stay low and keep paddle out front on reset'});
+  } else if (type === 'drop') {
+    if (peakMag < T_PEAK * 1.2) tips.push({t:'good', m:'Controlled drop shot pace'});
+    else tips.push({t:'warn', m:'Take more pace off the drop — aim for unattackable net height'});
+    tips.push({t:'warn', m:'Follow the drop in to the kitchen line'});
+  } else if (type === 'lob') {
+    tips.push({t:'warn', m:'Make sure lob clears your opponent by 2–3 feet'});
+    if (peakMag < T_PEAK * 1.5) tips.push({t:'good', m:'Good disguise on the lob'});
+  } else if (type === 'block') {
+    if (frames < 8) tips.push({t:'good', m:'Quick reflexes on block'});
+    tips.push({t:'warn', m:'Use soft hands — let the ball die on your paddle'});
+  } else if (type === 'flick') {
+    if (peakMag > T_PEAK * 2.0) tips.push({t:'good', m:'Great wrist acceleration on flick!'});
+    else tips.push({t:'warn', m:'Accelerate wrist snap later in the swing for more flick pace'});
+    tips.push({t:'warn', m:'Disguise the flick — same setup as dink until last moment'});
+  }
+
+  return tips.slice(0, 2);
+}
+
+// ── Shot recording ────────────────────────────────────────────
+
+// Rating: 1–5 stars based on technique warnings
+function rateShot(tech) {
+  const warns = tech.filter(t => t.t === 'warn').length;
+  const goods = tech.filter(t => t.t === 'good').length;
+  if (warns === 0 && goods >= 2) return 5;
+  if (warns === 0) return 4;
+  if (warns === 1 && goods >= 1) return 3;
+  if (warns === 1) return 2;
+  return 1;
+}
+function stars(n) { return '★'.repeat(n) + '☆'.repeat(5-n); }
+
+function recordShot(d) {
+  const type   = classify(d);
+  const tech   = assessTech(type, d);
+  const rating = rateShot(tech);
+  const exs    = EXERCISES[type] || [];
+
+  const shot = { type, rating, tech, exs, time: Date.now() };
+  session.shots.push(shot);
+
+  counts[type] = (counts[type]||0) + 1;
+
+  // UI updates
+  document.getElementById(`cnt-${type}`).textContent = counts[type];
+  addToHistory(shot);
+  setFeedbackAndDrill(tech, exs);
+  updateStats(type);
+  flashBadge(type);
+  pulseCard(type);
+}
+
+// ── UI helpers ────────────────────────────────────────────────
+
+const SHOT_COLORS = {
+  dink:'#00ff88', volley:'#00aaff', smash:'#ff4455',
+  reset:'#aa88ff', drop:'#00ddcc', drive:'#ffcc00',
+  lob:'#ff9944', block:'#7788ff', flick:'#ff55cc'
+};
+
+function flashBadge(type) {
+  const el = document.getElementById('shotBadge');
+  el.textContent = type.toUpperCase();
+  el.style.borderColor = SHOT_COLORS[type]||'#00ff88';
+  el.style.color = SHOT_COLORS[type]||'#00ff88';
+  el.style.display = 'block';
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.style.display='none', 1600);
+}
+
+function pulseCard(type) {
+  const card = document.getElementById(`card-${type}`);
+  if (!card) return;
+  card.classList.add('active');
+  setTimeout(() => card.classList.remove('active'), 1500);
+}
+
+function addToHistory(shot) {
+  const el = document.getElementById('shotHistory');
+  const ratingColor = shot.rating >= 4 ? 'q-good' : shot.rating >= 3 ? 'q-ok' : 'q-poor';
+  const div = document.createElement('div');
+  div.className = 'sh-entry';
+  div.innerHTML = `
+    <span class="sh-name">${cap(shot.type)}</span>
+    <span class="sh-badge ${ratingColor}" style="font-size:0.72rem;letter-spacing:0">${stars(shot.rating)}</span>`;
+  el.insertBefore(div, el.firstChild);
+  while (el.children.length > 25) el.removeChild(el.lastChild);
+}
+
+function setFeedbackAndDrill(tech, exs) {
+  document.getElementById('feedbackBox').innerHTML = tech.length
+    ? tech.map(t=>`<div class="fb-item"><div class="fb-dot ${t.t}"></div><div>${t.m}</div></div>`).join('')
+    : '<div style="color:var(--muted);font-size:0.8rem">Good form — keep it up!</div>';
+
+  const drill = exs[Math.floor(Math.random() * exs.length)];
+  document.getElementById('exerciseBox').innerHTML = drill
+    ? `<div class="ex-item"><span class="ex-ico">${drill.ico}</span><div>${drill.drill}</div></div>`
+    : '';
+}
+
+function updateStats(lastType) {
+  const n   = session.shots.length;
+  const top = Object.entries(counts).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById('sTot').textContent  = n;
+  document.getElementById('sTop').textContent  = top&&top[1]>0 ? cap(top[0]) : '—';
+  if (lastType) document.getElementById('sLast').textContent = cap(lastType);
+}
+
+// ── Session control ───────────────────────────────────────────
+
+function beginSession() {
+  isRunning = true;
+  session = { shots:[], startTime: Date.now() };
+  counts = { dink:0, drive:0, volley:0, overhead:0 };
+  poseHistory = [];
+  swingState = SS.IDLE;
+  swingData = null;
+  cooldown = 0;
+
+  ['dink','volley','smash','reset','drop','drive','lob','block','flick'].forEach(t => {
+    document.getElementById('cnt-'+t).textContent = '0';
+    document.getElementById('card-'+t).classList.remove('active');
+  });
+  document.getElementById('shotHistory').innerHTML = '';
+  document.getElementById('feedbackBox').innerHTML = '<div style="color:var(--muted);font-size:0.8rem">Hit some shots to get feedback…</div>';
+  document.getElementById('exerciseBox').innerHTML = '<div style="color:var(--muted);font-size:0.8rem">Drills will appear after shots are detected…</div>';
+  document.getElementById('sLast').textContent = '—';
+  updateStats(null);
+
+  document.getElementById('btnStop').classList.remove('hidden');
+  document.getElementById('btnReport').classList.add('hidden');
+  document.getElementById('recDot').style.display = 'block';
+
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    if (!isRunning) return;
+    const s = Math.floor((Date.now()-session.startTime)/1000);
+    document.getElementById('sDur').textContent = `${Math.floor(s/60)}:${(s%60).toString().padStart(2,'0')}`;
+  }, 1000);
+}
+
+function stopSession(showReport = true) {
+  isRunning = false;
+  if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+  if (mediaStream) { mediaStream.getTracks().forEach(t=>t.stop()); mediaStream = null; }
+  const vid = document.getElementById('videoEl');
+  vid.pause(); vid.srcObject = null;
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+
+  document.getElementById('btnStop').classList.add('hidden');
+  document.getElementById('recDot').style.display = 'none';
+
+  if (session.shots.length > 0 && showReport) {
+    document.getElementById('btnReport').classList.remove('hidden');
+  }
+}
+
+// ── Report ────────────────────────────────────────────────────
+
+function openReport() {
+  const n = session.shots.length;
+  if (!n) return;
+
+  const dur     = Math.floor((Date.now()-session.startTime)/1000);
+  const avgRating = (session.shots.reduce((a,s)=>a+s.rating,0)/n).toFixed(1);
+  const top     = Object.entries(counts).sort((a,b)=>b[1]-a[1])[0];
+  const fiveStarCount = session.shots.filter(s=>s.rating===5).length;
+
+  // Grid
+  document.getElementById('rGrid').innerHTML = [
+    [n,          'Total Shots'],
+    [avgRating+'★', 'Avg Rating'],
+    [fiveStarCount, '★★★★★ Shots'],
+    [cap(top?.[0]||'—'), 'Most Played'],
+    [Object.keys(counts).filter(k=>counts[k]>0).length, 'Shot Types Used'],
+    [`${Math.floor(dur/60)}:${(dur%60).toString().padStart(2,'0')}`, 'Duration'],
+  ].map(([v,l])=>`<div class="rg-cell"><div class="rg-val">${v}</div><div class="rg-lbl">${l}</div></div>`).join('');
+
+  // Bars
+  const maxC = Math.max(1, ...Object.values(counts));
+  document.getElementById('rBars').innerHTML = Object.entries(counts)
+    .filter(([,c])=>c>0)
+    .sort((a,b)=>b[1]-a[1])
+    .map(([t,c])=>`
+      <div class="shot-bar-row">
+        <div class="sbl">${cap(t)}</div>
+        <div class="sbt"><div class="sbf" style="width:${(c/maxC)*100}%;background:${SHOT_COLORS[t]}"></div></div>
+        <div class="sbn">${c}</div>
+      </div>`).join('');
+
+  // Technique tips (deduplicated warnings)
+  const allTech = session.shots.flatMap(s => s.tech||[]);
+  const warns = [...new Set(allTech.filter(t=>t.t==='warn').map(t=>t.m))].slice(0,3);
+  const goods = [...new Set(allTech.filter(t=>t.t==='good').map(t=>t.m))].slice(0,2);
+  const tipHTML = [
+    ...goods.map(m=>`<div class="tip"><span class="tip-ico">✅</span>${m}</div>`),
+    ...warns.map(m=>`<div class="tip"><span class="tip-ico">⚠️</span>${m}</div>`),
+  ];
+  if (!tipHTML.length) tipHTML.push(`<div class="tip"><span class="tip-ico">🏓</span>Keep rallying! More data will unlock detailed tips.</div>`);
+
+  // Recommended drills (one per weakest shot type)
+  const weakTypes = session.shots
+    .filter(s=>s.rating<=2)
+    .reduce((acc,s)=>{ acc[s.type]=(acc[s.type]||0)+1; return acc; }, {});
+  const drillHTML = Object.entries(weakTypes)
+    .sort((a,b)=>b[1]-a[1])
+    .slice(0,3)
+    .flatMap(([t])=> (EXERCISES[t]||[]).slice(0,1)
+      .map(e=>`<div class="tip"><span class="tip-ico">${e.ico}</span><strong>${cap(t)}:</strong> ${e.drill}</div>`));
+
+  document.getElementById('rTips').innerHTML = [...tipHTML, ...drillHTML].join('');
+
+  document.getElementById('reportModal').classList.add('open');
+}
+
+function closeReport() {
+  document.getElementById('reportModal').classList.remove('open');
+}
+
+// ── Util ──────────────────────────────────────────────────────
+
+function showLoading(msg) {
+  document.getElementById('loadingText').textContent = msg||'Loading…';
+  document.getElementById('loadingOverlay').style.display = 'flex';
+}
+function hideLoading() {
+  document.getElementById('loadingOverlay').style.display = 'none';
+}
+function cap(s) { return s.charAt(0).toUpperCase()+s.slice(1); }
+
+// Click outside report
+document.getElementById('reportModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('reportModal')) closeReport();
+});
+
+document.getElementById('handSelect').addEventListener('change', e => {
+  activeHand = e.target.value;
+});
+</script>
+</body>
+</html>
